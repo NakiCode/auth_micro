@@ -123,8 +123,7 @@ userSchema.methods.checkMatchPassword = async (candidatePassword, password) => {
         throw error;
     }
 };
-// Check is the given date is greater than the current
-// date or less than the current date
+// Vérifie si le code est valide
 userSchema.methods.isExpires = (currentDateTime, givenDateTime) => {
     let expires = date.isDateTimeExpires(currentDateTime, givenDateTime);
     return expires;
