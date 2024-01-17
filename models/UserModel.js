@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import validator from "validator";
+import generateCode from "../helpers/code/codeGenerate";
 
 const errorMessages = {
   required: "The {PATH} is required",
@@ -78,15 +79,17 @@ const userSchema = new mongoose.Schema({
   },
   code: {
     type: String,
+    trim: true,
+    default: generateCode(6),
     select: false
   },
   firebaseToken: {
     type: String,
-    trim: true,
-    select: false
+    trim: true
   },
   tokenId: {
     type: String,
+    default: generateCode(8),
     select: false
   },
   profil: {

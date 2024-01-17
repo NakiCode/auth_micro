@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-export const generateCode = (codeLength = 8) => {
+const generateCode = (codeLength = 8) => {
     try {
         if (typeof codeLength !== 'number' || codeLength <= 0) {
             throw new errGenerate('InvalidCodeLengthError', 'Invalid code length', 400);
@@ -12,3 +12,4 @@ export const generateCode = (codeLength = 8) => {
         return '07000070'; // Valeur par défaut en cas d'erreur
     }
 };
+export default generateCode;
