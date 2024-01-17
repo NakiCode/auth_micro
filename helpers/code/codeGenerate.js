@@ -9,7 +9,7 @@ const generateCode = (codeLength = 8) => {
         const code = parseInt(randomBytes.toString('hex'), 16).toString().slice(0, codeLength);
         return code;
     } catch (error) {
-        return '07000070'; // Valeur par défaut en cas d'erreur
+        return '070070'; // Valeur par défaut en cas d'erreur
     }
 };
 export default generateCode;

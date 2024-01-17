@@ -1,8 +1,9 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import validator from "validator";
-import generateCode from "../helpers/code/codeGenerate";
+import generateCode from "../helpers/code/codeGenerate.js";
 import * as date from "../helpers/date/time.js";
+
 const errorMessages = {
     required: "The {PATH} is required",
     minLength: "The {PATH} must be at least {MINLENGTH} characters",
@@ -108,6 +109,22 @@ userSchema.methods.checkMatchPassword = async (candidatePassword, password) => {
         return await bcrypt.compare(candidatePassword, password);
     } catch (error) {
         // Gérer l'erreur ici
+        throw error;
+    }
+};
+// User generate token, refresh token and cookies
+userSchema.methods.generateToken = async function () {
+    try {
+        const token = await jwt.sign(
+            { _id: this._id,
+            type:"access", 
+            role: this.role, 
+            tokenId: this.tokenId 
+            }, process.env.JWT_SECRET, 
+            {expiresIn: process.env.JWT_EXPIRES_IN}
+        );
+        return token;
+    } catch (error) {
         throw error;
     }
 };
