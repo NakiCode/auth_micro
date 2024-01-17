@@ -48,21 +48,9 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    coordinate: {
-        type: {
-            type: String,
-            enum: ["Point"],
-            default: "Point"
-        },
-        coordinates: {
-            type: [Number],
-            default: [0, 0]
-        },
-        address: {
-            type: String,
-            trim: true
-        },
-        index: "2dsphere"
+    address: {
+        type: String,
+        trim: true
     },
     password: {
         type: String,
