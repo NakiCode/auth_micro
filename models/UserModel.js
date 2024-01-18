@@ -57,12 +57,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         trim: true,
         minLength: [6, errorMessages.minLength.replace("{MINLENGTH}", "6")],
-        validate: {
-            validator: function (value) {
-                return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/.test(value);
-            },
-            message: errorMessages.passwordFormat
-        },
         required: [true, errorMessages.required],
         select: false
     },
