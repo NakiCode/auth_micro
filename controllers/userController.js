@@ -5,6 +5,7 @@ import sender from "../helpers/mail/sender.js";
 import * as typeEmail from "../helpers/mail/emailTypes.js";
 import * as token from "../helpers/jwt/token.js";
 import attachCookies from "../helpers/jwt/cookies.js";
+import *  as isPhoneorEmail from "../helpers/keys/verify.js";
 
 // ####################### CREATE USER 
 export const createUser = catchAsync(async (req, res, next) => {
@@ -14,6 +15,7 @@ export const createUser = catchAsync(async (req, res, next) => {
         return res.status(isMatch.statusCode).json({
             success: false,
             statusCode: isMatch.statusCode,
+            data: [],
             message: isMatch.message
         })
     }
@@ -32,7 +34,7 @@ export const createUser = catchAsync(async (req, res, next) => {
 })
 // ########################################################################
 export const verifyUser = catchAsync(async (req, res, next) => {
-    const code = req.query.code;
+    const { code } = req.query;
     const user = await tbl_User.findOne({ code: code }).select(
         "+codeExpiresAt +tokenId +code"
     );
@@ -75,7 +77,7 @@ export const verifyUser = catchAsync(async (req, res, next) => {
 });
 
 export const verifyCode = catchAsync(async (req, res, next) => {
-    const code = req.query.code;
+    const { code } = req.query;
     const user = await tbl_User.findOne({ code: code });
     if (!user) {
         return res.status(404).json({
@@ -94,12 +96,13 @@ export const verifyCode = catchAsync(async (req, res, next) => {
         });
     }
     user.codeExpiresAt = null;
+    user.code = null;
     user.save({ new: true, runValidators: true });
 
     res.status(200).json({
         success: true,
         statusCode: 200,
-        data: user,
+        data: user._id,
         message: "User verified successfully",
     });
 });
@@ -230,8 +233,8 @@ export const getAllUser = catchAsync(async (req, res, next) => {
 
 // ############### FORGET PASSWORD ############################################
 export const forgetPassword = catchAsync(async (req, res, next) => {
-    const {email, phone} = req.body;
-    if(!email || !phone){
+    const { email, phone } = req.body;
+    if (!email || !phone) {
         return res.status(400).json({
             success: false,
             statusCode: 400,
@@ -239,7 +242,7 @@ export const forgetPassword = catchAsync(async (req, res, next) => {
             message: "Please provide email or phone",
         });
     }
-    const element  = email?email:phone
+    const element = email ? email : phone
     const user = await tbl_User.findOne({ $or: [{ email: element }, { phone: element }] });
     if (!user) {
         return res.status(404).json({
@@ -249,26 +252,125 @@ export const forgetPassword = catchAsync(async (req, res, next) => {
             message: "User not found",
         });
     }
-    if()
-    const code = Math.floor(100000 + Math.random() * 900000);
-    user.code = code;
-    user.codeExpiresAt = new Date(Date.now() + 30 * 60 * 1000);
-    user.save({ new: true, runValidators: true });
-    const format = typeEmail.emailCheckResetPassword
-    format.code = code
-    res.status(200).json({
-        success: true,
-        statusCode: 200,
+    if (isPhoneorEmail.isEmailAdress(element)) {
+        if (!user.isEmail) {
+            return res.status(400).json({
+                success: false,
+                statusCode: 400,
+                data: [],
+                message: "Please verify your email first",
+            });
+        }
+        const code = Math.floor(100000 + Math.random() * 900000);
+        user.code = code;
+        user.codeExpiresAt = new Date(Date.now() + 30 * 60 * 1000);
+        user.save({ new: true, runValidators: true });
+        const format = typeEmail.emailCheckResetPassword
+        format.code = code
+        res.status(200).json({
+            success: true,
+            statusCode: 200,
+            data: [],
+            message: "Code sent successfully to your email address",
+        });
+        await sender(user.email, format)
+    }
+    if (isPhoneorEmail.isPhoneNumber(element)) {
+        if (!user.isPhone) {
+            return res.status(400).json({
+                success: false,
+                statusCode: 400,
+                data: [],
+                message: "Please verify your phone first",
+            });
+        }
+        const code = Math.floor(100000 + Math.random() * 900000);
+        user.code = code;
+        user.codeExpiresAt = new Date(Date.now() + 30 * 60 * 1000);
+        user.save({ new: true, runValidators: true });
+        let codeToSend = user.code
+        // send sms
+        res.status(200).json({
+            success: true,
+            statusCode: 200,
+            data: [],
+            message: "Code sent successfully to your phone number",
+        });
+    }
+    return res.status(400).json({
+        success: false,
+        statusCode: 400,
         data: [],
-        message: "Code sent successfully",
+        message: "Please try again later."
     });
-    await sender(user.email, format)
 })
 
 // ############### CHANGE EMAIL ############################################
+export const changeEmail = catchAsync(async (req, res, next) => {
+    const { email } = req.body;
+    const user = await tbl_User.findOneAndUpdate({ _id: req.user._id }, { email }, { new: true, runValidators: true });
+    if (!user) {
+        return res.status(404).json({
+            success: false,
+            statusCode: 404,
+            data: [],
+            message: "User not found",
+        });
+    }
+    if (!isPhoneorEmail.isEmailAdress(email)) {
+        return res.status(400).json({
+            success: false,
+            statusCode: 400,
+            data: [],
+            message: "Please verify your email first",
+        });
+    }
+    user.isEmail = false;
+    user.code = Math.floor(100000 + Math.random() * 900000);
+    user.codeExpiresAt = new Date(Date.now() + 30 * 60 * 1000);
+    user.save({ new: true, runValidators: true });
+    // ############ send email #################
+    let format = typeEmail.emailChangeReset
+    format.code = user.code
+    res.status(200).json({
+        success: true,
+        statusCode: 200,
+        data: user,
+        message: "User updated successfully",
+    });
+    await sender(user.email, format)
 
-// ############### CHANGE PHONE ############################################
-
-// ############### CHANGE ADDRESS ############################################
+})
 
 // ############### CHANGE PASSWORD ############################################
+export const changePassword = catchAsync(async (req, res, next) => {
+    const { password, confirmpassword, id } = req.body;
+    let isMatch = checkPasswordStrength(password, confirmpassword)
+    if (!isMatch.success) {
+        return res.status(isMatch.statusCode).json({
+            success: false,
+            statusCode: isMatch.statusCode,
+            message: isMatch.message
+        })
+    }
+    const user = await tbl_User.findOneAndUpdate({ _id: id }, { password },
+        { new: true, runValidators: true });
+    if (!user) {
+        return res.status(404).json({
+            success: false,
+            statusCode: 404,
+            data: [],
+            message: "User not found",
+        });
+    }
+    let tokenData = token.attachTokenToUser(user);
+    attachCookies(tokenData.access, tokenData.refresh, res);
+
+    return res.status(200).json({
+        success: true,
+        statusCode: 200,
+        data: user,
+        ...tokenData,
+        message: "Password reset successfully"
+    });
+})

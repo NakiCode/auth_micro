@@ -1,4 +1,4 @@
-export const isEmail = (input) => {
+export const isEmailAdress = (input) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(input);
 }
