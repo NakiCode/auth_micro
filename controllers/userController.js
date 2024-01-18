@@ -147,7 +147,7 @@ export const login = catchAsync(async (req, res, next) => {
     let tokenData = token.attachTokenToUser(user);
     attachCookies(tokenData.access, tokenData.refresh, res);
 
-    res.status(200).json({
+    return res.status(200).json({
         success: true,
         statusCode: 200,
         data: user,
@@ -157,10 +157,8 @@ export const login = catchAsync(async (req, res, next) => {
 })
 // ############### UPDATE USER ############################################
 export const updateUser = catchAsync(async (req, res, next) => {
-    const user = await tbl_User.findByIdAndUpdate(req.user._id, req.body, {
-        new: true,
-        runValidators: true,
-    });
+    const user = await tbl_User.findByIdAndUpdate(req.user._id, req.body, 
+        {new: true, runValidators: true, upsert: true});
     if (!user) {
         return res.status(404).json({
             success: false,
