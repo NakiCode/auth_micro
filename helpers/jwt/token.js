@@ -12,7 +12,7 @@ const signRefreshToken = (payload) => {
     return jwt.sign(
         { _id: payload._id, type: "refresh", role: payload.role, tokenId: payload.tokenId },
         privateKey,
-        { algorithm: 'RS256', expiresIn: process.env.JWT_REFRESH_EXPIRES }
+        { algorithm: 'RS256', expiresIn: process.env.JWT_REFRESH_EXPIRES_IN }
     );
 };
 
@@ -35,14 +35,13 @@ export const attachTokenToUser = (payload) => {
     return { access, refresh };
 };
 
-export const checkAccessToken = async (token) => {
+export const checkToken = async (token) => {
     try {
         const data = {
             success: false,
             data: null,
             message: "Invalid Token",
         };
-
         try {
             const decodedToken = await verifyToken(token);
             data.success = true;
