@@ -107,6 +107,31 @@ export const verifyCode = catchAsync(async (req, res, next) => {
     });
 });
 
+export const sendCodeToPhone = catchAsync(async (req, res, next) => {
+    const findUser = await tbl_User.findOne({ _id: req.ures._id });
+    if (!findUser) {
+        return res.status(404).json({
+            success: false,
+            statusCode: 404,
+            data: [],
+            message: "User not found",
+        })
+    }
+    const code = Math.floor(100000 + Math.random() * 900000);
+    findUser.code = code;
+    findUser.codeExpiresAt = new Date(Date.now() + 30 * 60 * 1000);
+    findUser.save({ new: true, runValidators: true });
+    // send sms
+
+    return res.status(200).json({
+        success: true,
+        statusCode: 200,
+        data: user._id,
+        message: "Code sent successfully to your phone number",
+    })
+
+});
+
 // #################### LOGIN #############################################
 export const login = catchAsync(async (req, res, next) => {
     const { email, username, phone, password } = req.body

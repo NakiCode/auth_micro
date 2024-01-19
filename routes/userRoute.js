@@ -6,6 +6,7 @@ const router = express.Router()
 router.post('/signup', userController.createUser);
 router.post('/login', userController.login);
 router.get('/verifyEmail', userController.verifyUser);
+router.get('/sendtophone', userController.sendCodeToPhone);
 router.get('/verifyPhone', userController.verifyUser);
 router.get('/verifyCode', userController.verifyCode);
 router.get('/getAll', userController.getAllUser);
@@ -15,6 +16,7 @@ router.delete('/delete', userController.deleteUser);
 router.post('/forgetPassword', userController.forgetPassword);
 router.put('/changeEmail', userController.changeEmail);
 router.put('/changePassword', userController.changePassword);
+
 
 
 export default router
