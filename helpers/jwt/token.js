@@ -30,7 +30,7 @@ const verifyToken = (token) => {
 
 export const verifyRefreshToken = (token) => {
     return new Promise((resolve, reject) => {
-        jwt.verify(token, process.env.JWT_SECRET,  (err, decoded) => {
+        jwt.verify(token, process.env.JWT_REFRESH_SECRET,  (err, decoded) => {
             if (err) {
                 reject(err);
             } else {
