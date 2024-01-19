@@ -1,25 +1,24 @@
+import jwt from 'jsonwebtoken';
+
 const signAccessToken = (payload) => {
-    const privateKey = fs.readFileSync('./rsa/privateKey.pem'); // Lire la clé privée depuis le fichier
     return jwt.sign(
         { _id: payload._id, type: "access", role: payload.role, tokenId: payload.tokenId },
-        privateKey,
-        { algorithm: 'RS256', expiresIn: process.env.JWT_EXPIRES_IN }
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN }
     );
 };
 
 const signRefreshToken = (payload) => {
-    const privateKey = fs.readFileSync('./rsa/privateKey.pem'); // Lire la clé privée depuis le fichier
     return jwt.sign(
         { _id: payload._id, type: "refresh", role: payload.role, tokenId: payload.tokenId },
-        privateKey,
-        { algorithm: 'RS256', expiresIn: process.env.JWT_REFRESH_EXPIRES_IN }
+        process.env.JWT_REFRESH_SECRET,
+        {expiresIn: process.env.JWT_REFRESH_EXPIRES_IN }
     );
 };
 
 const verifyToken = (token) => {
-    const publicKey = fs.readFileSync('./rsa/publicKey.pem'); // Lire la clé publique depuis le fichier
     return new Promise((resolve, reject) => {
-        jwt.verify(token, publicKey, { algorithms: ['RS256'] }, (err, decoded) => {
+        jwt.verify(token, process.env.JWT_SECRET,  (err, decoded) => {
             if (err) {
                 reject(err);
             } else {
@@ -28,6 +27,19 @@ const verifyToken = (token) => {
         });
     });
 };
+
+export const verifyRefreshToken = (token) => {
+    return new Promise((resolve, reject) => {
+        jwt.verify(token, process.env.JWT_SECRET,  (err, decoded) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(decoded);
+            }
+        });
+    });
+};
+
 
 export const attachTokenToUser = (payload) => {
     const access = signAccessToken(payload);
