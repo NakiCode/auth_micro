@@ -3,8 +3,6 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import moment from "moment-timezone";
 import dbConnect from "./config/db.js";
-import userRoute from "./routes/userRoute.js";
-import errorHandle from "./middleware/err/errHendle.js";
 import morgan from "morgan";
 import fs from 'fs';
 
@@ -31,12 +29,10 @@ if (process.env.NODE_ENV === "production") {
 
 
 // ROUTES
-app.use(`${process.env.API_URI}/user`, userRoute);
-
 
 
 // MIDDLEWARE ERROR HANDLE
-app.use(errorHandle)
+
 // -------------------------------------------------------
 const PORT = process.env.PORT
 // DATABASE

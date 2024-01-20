@@ -1,8 +1,6 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import validator from "validator";
-import generateCode from "../helpers/code/codeGenerate.js";
-import * as date from "../helpers/date/time.js";
 
 const errorMessages = {
   required: "The {PATH} is required",
@@ -42,34 +40,11 @@ const userSchema = new mongoose.Schema(
       required: [true, errorMessages.required],
       validate: [validator.isMobilePhone, errorMessages.phoneFormat]
     },
-    isPhone: {
-      type: Boolean,
-      default: false
-    },
-    isEmail: {
-      type: Boolean,
-      default: false
-    },
-    address: {
-      type: String,
-      trim: true
-    },
     password: {
       type: String,
       trim: true,
       minlength: [6, errorMessages.minLength.replace("{MINLENGTH}", "6")],
       required: [true, errorMessages.required],
-      select: false
-    },
-    code: {
-      type: String,
-      trim: true,
-      default: generateCode(6),
-      select: false
-    },
-    codeExpiresAt: {
-      type: Date,
-      default: date.DefaultDateExpires(),
       select: false
     },
     firebaseToken: {
@@ -86,6 +61,39 @@ const userSchema = new mongoose.Schema(
       trim: true
     },
     couverture: {
+      type: String,
+      trim: true
+    },
+    address: {
+      type: String,
+      trim: true
+    },
+    location: {
+      type: [Number]
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false
+    },
+    isPhoneVerified: {
+      type: Boolean,
+      default: false
+    },
+    phoneCode: {
+      type: String,
+      trim: true
+    },
+    emailCode: {
+      type: String,
+      trim: true
+    },
+    phoneCodeExpiresAt: {
+      type: Date
+    },
+    emailCodeExpiresAt: {
+      type: Date
+    },
+    signature: {
       type: String,
       trim: true
     },
