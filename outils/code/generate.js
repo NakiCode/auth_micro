@@ -10,8 +10,8 @@ export const generateCode = (codeLength = 8) => {
         return '0770';
     }
 };
-export const verifyCode = (payload, code) => {
-    if (payload.code === code) {
+export const isVerifyCode = (payload, code) => {
+    if (payload?.code === code) {
         return true;
     } else {
         return false
