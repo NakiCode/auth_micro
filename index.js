@@ -11,7 +11,9 @@ import hpp from "hpp";
 import mongoSanitize from "express-mongo-sanitize";
 import cookieParser from "cookie-parser";
 import errorHandle from "./middleware/err/errHendle.js";
+import toobusyProtect from "./middleware/secure/toobusy.js";
 
+// Configuration
 dotenv.config();
 moment.tz.setDefault(process.env.TIMEZONE);
 
@@ -37,7 +39,7 @@ app.use(helmet.noSniff());
 app.use(mongoSanitize());
 app.use(express.urlencoded({ extended: true, limit: "3kb" }));
 
-app.use(express.static("Fichiers/"));
+app.use(express.static("files/"));
 
 if (process.env.NODE_ENV === "production") {
     app.use(express.static("client/build"));
@@ -48,7 +50,7 @@ app.enable("trust proxy");
 if (process.env.NODE_ENV === "development") {
     app.use(cors());
 } else if (process.env.NODE_ENV === "production") {
-    const whitelist = ["192.168.40.58"];
+    const whitelist = ["*"];
     const corsOptions = {
         origin: function (origin, callback) {
             if (whitelist.includes(origin)) {
@@ -61,9 +63,8 @@ if (process.env.NODE_ENV === "development") {
     app.use(cors(corsOptions));
 }
 
-app.use(morgan("dev"));
 app.use(hpp());
-
+app.use(toobusyProtect);
 // Routes
 
 // Middleware de gestion des erreurs

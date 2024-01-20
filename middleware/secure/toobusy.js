@@ -1,6 +1,6 @@
 import toobusy from "toobusy-js";
 
-const toobusyMiddleware = (req, res, next) => {
+const toobusyProtect = (req, res, next) => {
   if (toobusy()) {
     return res.status(503).json({
       statusCode: 503,
@@ -11,4 +11,4 @@ const toobusyMiddleware = (req, res, next) => {
   next();
 };
 
-export default toobusyMiddleware;
+export default toobusyProtect;
