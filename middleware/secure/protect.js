@@ -1,40 +1,44 @@
-import * as jwt from "../../helpers/jwt/jwt.js";
+import * as jwtToken from "../../middleware/jwt/token.js";
+import * as jwtCookie from "../../middleware/jwt/cookies.js";
 import catchAsync from "../../helpers/err/catchAsync.js";
-import response from "../../helpers/response/responseMessage.js";
-import { tbl_User } from "../../models/user/userModel.js";
+import { tbl_User } from "../../models/UserModel.js";
 
-// To protect route for verify if user is authorized to access to resource
 const protect = catchAsync(async (req, res, next) => {
     let token;
-    let respo = response(401, false, [], "Accès refusé par authentification ou par autorisation");
     if (req.cookies && req.cookies.jwt) {
-        if (jwt.isCookieTokenExpired(req.cookies.jwt)) { }
+        if (jwtCookie.isCookiesExpired(req.cookies.jwt)) {
+            // Gérer l'expiration des cookies JWT
+            return handleUnauthorized(res, "Veuillez vous reconnecter");
+        }
         token = req.cookies.jwt;
     }
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1];
     }
     if (!token) {
-        return res.status(401).json(respo);
+        return handleUnauthorized(res, "Veuillez vous reconnecter");
     }
-    const verifyToken = await jwt.verifyToken(token);
+    const verifyToken = await jwtToken.verifyAccessToken(token);
     if (!verifyToken) {
-        return res.status(401).json(respo);
+        return handleUnauthorized(res, "Veuillez vous reconnecter");
     }
-    const expiresToken = jwt.isTokenExpired(token);
-    if (expiresToken) {
-        let respo = response(401, false, [], "Veuillez vous connecter, le token est expiré");
-        return res.status(401).json(respo)
-    }
-    const decodeToken = jwt.decodeToken(token);
-    const user = await tbl_User.findOne({ _id: decodeToken.id, tokenId: decodeToken.tokenId });
+    const user = await tbl_User.findOne({ _id: verifyToken.id, tokenId: verifyToken.tokenId });
     if (!user) {
-        let respo = response(401, false, [], "Veuillez vous reconnecter");
-        return res.status(401).json(respo);
-    };
+        return handleUnauthorized(res, "Veuillez vous reconnecter");
+    }
     req.user = user;
     return next();
-})
+});
 
+// Fonction utilitaire pour gérer les réponses d'erreur
+function handleUnauthorized(res, message) {
+    const respo = response(401, false, [], message);
+    return res.status(401).json(respo);
+}
+
+// Fonction utilitaire pour générer une réponse JSON standardisée
+function response(status, success, data, message) {
+    return { status, success, data, message };
+}
 
 export default protect;
