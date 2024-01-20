@@ -5,7 +5,7 @@ import errConstructor from "../err/err.js";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "Fichiers/images");
+    cb(null, "files/images");
   },
   filename: function (req, file, cb) {
     // Génération d'un nom de fichier unique
