@@ -9,7 +9,7 @@ export const generateCode = (codeLength = 8) => {
     }
 };
 export const isVerifyCode = (payload, code) => {
-    if (payload?.code === code) {
+    if (payload === code) {
         return true;
     } else {
         return false;
