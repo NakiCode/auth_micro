@@ -1,6 +1,4 @@
 import crypto from 'crypto';
-import errConstructor from '../../middleware/err/err.js';
-
 export const generateCode = (codeLength = 8) => {
     try {
         const randomBytes = crypto.randomBytes(codeLength);
@@ -14,6 +12,6 @@ export const isVerifyCode = (payload, code) => {
     if (payload?.code === code) {
         return true;
     } else {
-        return false
+        return false;
     }
 }
