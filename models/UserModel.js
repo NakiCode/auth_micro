@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import validator from "validator";
-
+import * as generate from "../helpers/code/generate.js";
+import * as timeGenerate from "../helpers/date/time.js";
 const errorMessages = {
   required: "The {PATH} is required",
   minLength: "The {PATH} must be at least {MINLENGTH} characters",
@@ -53,7 +54,7 @@ const userSchema = new mongoose.Schema(
     },
     tokenId: {
       type: String,
-      default: generateCode(8),
+      default: generate.generateCode(8),
       select: false
     },
     profil: {
@@ -88,14 +89,17 @@ const userSchema = new mongoose.Schema(
       trim: true
     },
     phoneCodeExpiresAt: {
-      type: Date
+      type: Date,
+      default: timeGenerate.DefaultDateExpires()
     },
     emailCodeExpiresAt: {
-      type: Date
+      type: Date,
+      default: timeGenerate.DefaultDateExpires()
     },
     signature: {
       type: String,
-      trim: true
+      trim: true,
+      default: generate.generateCode(32)
     },
     role: {
       type: String,
@@ -119,7 +123,7 @@ userSchema.methods.checkMatchPassword = async function (candidatePassword) {
 
 // Check if the code is valid
 userSchema.methods.isExpires = function (currentDateTime, givenDateTime) {
-  return date.isDateTimeExpires(currentDateTime, givenDateTime);
+  return timeGenerate.isDateTimeExpires(currentDateTime, givenDateTime);
 };
 
 // Hash the password before saving
