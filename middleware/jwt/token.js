@@ -73,7 +73,7 @@ export const attachTokensToUser = (payload) => {
   const access = signAccessToken(payload);
   const refresh = signRefreshToken(payload);
   const apiKey = signApiKey(payload);
-  return { access, refresh, apiKey };
+  return { access, refresh, apiKey, payload };
 };
 
 const isTokenExpired = (expirationTime) => {

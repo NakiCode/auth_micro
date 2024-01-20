@@ -1,6 +1,6 @@
 import * as jwtToken from "../../middleware/jwt/token.js";
 import * as jwtCookie from "../../middleware/jwt/cookies.js";
-import catchAsync from "../../helpers/err/catchAsync.js";
+import catchAsync from "../../middleware/catch/catchAsync.js";
 import { tbl_User } from "../../models/UserModel.js";
 
 const protect = catchAsync(async (req, res, next) => {
