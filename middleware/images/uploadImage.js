@@ -1,7 +1,7 @@
-import multer  from "multer";
+import multer from "multer";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
-import { FileErrHandle } from "../../helpers/err/fileErr.js";
+import errConstructor from "../err/err.js";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
     // Génération d'un nom de fichier unique
     const ext = path.extname(file.originalname);
     const filename = uuidv4() + ext;
-    cb(null, `${filename}`); 
+    cb(null, `${filename}`);
   }
 });
 
@@ -21,7 +21,7 @@ const fileFilter = function (req, file, cb) {
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true); // Accepter le fichier
   } else {
-    cb(new FileErrHandle('Le fichier doit être une image (JPEG, PNG ou JPG).'), false); // Rejeter le fichier
+    cb(new errConstructor("FileFormatError", "Le fichier doit être une image (JPEG, PNG ou JPG).", 400), false); // Rejeter le fichier
   }
 };
 
@@ -33,12 +33,7 @@ export const uploadImage = multer({
   },
   fileFilter: fileFilter
 }).fields([
-    { name: 'profile', maxCount: 1 },
-    { name: 'couverture', maxCount: 1 },
-    { name: 'imageResto', maxCount: 1 },
-    { name: 'couvertureResto', maxCount: 1 },
-    { name: 'imageProduct', maxCount: 3 },
-    {name: 'imageCategorie', mawCount: 1}
-
-  ]);
+  { name: 'profil', maxCount: 1 },
+  { name: 'couverture', maxCount: 1 }
+]);
 
