@@ -111,7 +111,6 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 // Check if the password matches
 userSchema.methods.checkMatchPassword = async function (candidatePassword) {
   try {
@@ -120,12 +119,10 @@ userSchema.methods.checkMatchPassword = async function (candidatePassword) {
     throw error;
   }
 };
-
 // Check if the code is valid
 userSchema.methods.isExpires = function (currentDateTime, givenDateTime) {
   return timeGenerate.isDateTimeExpires(currentDateTime, givenDateTime);
 };
-
 // Hash the password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
