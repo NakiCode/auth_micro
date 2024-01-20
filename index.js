@@ -5,7 +5,7 @@ import moment from "moment-timezone";
 import dbConnect from "./config/db.js";
 import morgan from "morgan";
 import fs from 'fs';
-
+import cookieParser  from "cookie-parser";
 // APP CONFIG
 const app = express();
 
@@ -15,6 +15,8 @@ moment.tz.setDefault(process.env.TIMEZONE);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("files"));
+// COOKIES PARSER
+app.use(cookieParser());
 // -------------------------------------------------------
 // MORGAN
 if (process.env.NODE_ENV === "production") {
