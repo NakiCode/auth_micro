@@ -1,4 +1,4 @@
-class errGenerate extends Error {
+class errConstructor extends Error {
     constructor(name, message, statusCode) {
       super(message);
       this.name = name;
@@ -10,4 +10,4 @@ class errGenerate extends Error {
     }
 }
 
-export default errGenerate;
+export default errConstructor;
