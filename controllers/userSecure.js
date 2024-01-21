@@ -14,9 +14,9 @@ export const checkEmailCode = catchAsync(async (req, res, next) => {
         foundUser = await tbl_User.findOne(
             { $and: [{ _id: req.user._id }, 
             { emailCode: req.query.code }] 
-        }).select('+tokenId');
+        }).select('+tokenId +emailCode');
     } else {
-        foundUser = await tbl_User.findOne({ emailCode: req.query.code }).select('+tokenId');
+        foundUser = await tbl_User.findOne({ emailCode: req.query.code }).select('+tokenId  +emailCode');
     }
     if (!foundUser) {
         defaultResponse.message = "Code invalide";
@@ -48,9 +48,12 @@ export const checkPhoneCode = catchAsync(async (req, res, next) => {
         return res.status(404).json(defaultResponse);
     }
     if (req.user && req.user._id) {
-        foundUser = await tbl_User.findOne({ $and: [{ _id: req.user._id }, { phoneCode: req.query.code }] }).select('+tokenId');
+        foundUser = await tbl_User.findOne(
+            { $and: [{ _id: req.user._id }, 
+            { phoneCode: req.query.code }] 
+        }).select('+tokenId +phoneCode');
     } else {
-        foundUser = await tbl_User.findOne({ phoneCode: req.query.code }).select('+tokenId');
+        foundUser = await tbl_User.findOne({ phoneCode: req.query.code }).select('+tokenId +phoneCode');
     }
     if (!foundUser) {
         defaultResponse.message = "Code invalide";

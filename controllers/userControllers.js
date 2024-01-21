@@ -6,8 +6,8 @@ import * as emailTypes from "../outils/mail/emailTypes.js";
 
 // ---------------------------------------------------------------
 export const createUser = catchAsync(async (req, res, next) => {
-    const {fullname, username, email, password, firebaseToken, address, location} = req.body
-    const isStrong = isStrengthPwd(password, confirmPassword);
+    const {fullname, username, email, password, confirmpassword, firebaseToken, address, location} = req.body
+    const isStrong = isStrengthPwd(password, confirmpassword);
     if (!isStrong.success) {
         return res.status(isStrong.statusCode).json({
             statusCode: isStrong.statusCode,
@@ -18,7 +18,7 @@ export const createUser = catchAsync(async (req, res, next) => {
     }
     const user = await tbl_User.create({ 
         fullname, username, email, 
-        password, confirmPassword, 
+        password, 
         firebaseToken, address, location
     });
     res.status(201).json({

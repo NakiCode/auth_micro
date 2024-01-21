@@ -5,11 +5,12 @@ const response = (code, success, data, message) => {
         statusCode: code,
         success: success,
         data: data ? data : [],
-        message: message,
+        message: message ? message : "",
     };
     return responseData;
 };
 const errorHandle = (err, req, res, next) => {
+    console.log(err)
     if (err.name === "ValidationError") {
         const errors = Object.values(err.errors).map((el) => el.message);
         const message = errors.join('. ');

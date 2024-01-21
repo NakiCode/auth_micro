@@ -38,9 +38,7 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       trim: true,
-      unique: [true, errorMessages.unique],
-      required: [true, errorMessages.required],
-      validate: [validator.isMobilePhone, errorMessages.phoneFormat]
+      unique: [true, errorMessages.unique]
     },
     password: {
       type: String,
@@ -83,11 +81,15 @@ const userSchema = new mongoose.Schema(
     },
     phoneCode: {
       type: String,
-      trim: true
+      trim: true,
+      default: generate.generateCode(6),
+      select: false
     },
     emailCode: {
       type: String,
-      trim: true
+      trim: true,
+      default: generate.generateCode(6),
+      select: false
     },
     phoneCodeExpiresAt: {
       type: Date,
