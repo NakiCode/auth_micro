@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import validator from "validator";
 import * as generate from "../helpers/code/generate.js";
 import * as timeGenerate from "../helpers/date/time.js";
+import * as hashpwd from "../helpers/pwd/hashpwd.js";
 const errorMessages = {
   required: "The {PATH} is required",
   minLength: "The {PATH} must be at least {MINLENGTH} characters",
@@ -134,8 +135,7 @@ userSchema.methods.isExpires = function (candidateDate, currentDate) {
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    this.password = await hashpwd.hashPwd(this.password);
     next();
   } catch (error) {
     next(error);
