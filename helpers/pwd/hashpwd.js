@@ -11,7 +11,7 @@ export const isMatch = async (pwd, hashPwd) => {
     return await bcrypt.compare(pwd, hashPwd);
 }
 
-export const checkPasswordStrength = (password, confirmPassword) => {
+export const isStrengthPwd = (password, confirmPassword) => {
     const strong = {
         success: false,
         message: "",
