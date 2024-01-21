@@ -12,6 +12,7 @@ import mongoSanitize from "express-mongo-sanitize";
 import cookieParser from "cookie-parser";
 import errorHandle from "./middleware/err/errHendle.js";
 import toobusyProtect from "./middleware/secure/toobusy.js";
+import userRoute from "./routes/userRoute.js";
 
 // Configuration
 dotenv.config();
@@ -66,7 +67,7 @@ if (process.env.NODE_ENV === "development") {
 app.use(hpp());
 app.use(toobusyProtect);
 // Routes
-
+app.use(`${process.env.BASE_URL}/user`, userRoute);
 // Middleware de gestion des erreurs
 app.use(errorHandle);
 

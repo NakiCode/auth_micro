@@ -55,8 +55,7 @@ export const isCookiesExpired = (req) => {
 };
 
 export default {
-    CookieError,
     COOKIE_NAMES,
     attachCookies,
-    isCookiesExpired,
+    isCookiesExpired
 };
