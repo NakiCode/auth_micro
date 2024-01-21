@@ -5,7 +5,7 @@ import express from "express";
 
 const router = express.Router();
 
-router.post("/create/user", userController.createUser);
+router.post("/signup", userController.createUser);
 
 router.get("/verify/email/account", userSecure.checkEmailCode);
 router.get("/verify/phone/account", userSecure.checkPhoneCode);
