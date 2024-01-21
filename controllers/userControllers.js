@@ -1,1 +1,1 @@
-import {tbl_User} from "../models/UserModel.js"
+import {tbl_User} from "../models/UserModel.js";
