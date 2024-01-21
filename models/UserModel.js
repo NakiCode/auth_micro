@@ -120,8 +120,15 @@ userSchema.methods.checkMatchPassword = async function (candidatePassword) {
   }
 };
 // Check if the code is valid
-userSchema.methods.isExpires = function (currentDateTime, givenDateTime) {
-  return timeGenerate.isDateTimeExpires(currentDateTime, givenDateTime);
+userSchema.methods.isMatchCode = function (candidateCode, code) {
+  return this[candidateCode] === code ? true : false;
+};
+userSchema.methods.isExpires = function (candidateDate, currentDate) {
+  const { [candidateDate]: candidate } = this;
+  if (candidate) {
+    return timeGenerate.isDateTimeExpires(candidate, currentDate);
+  }
+  return false; // ou une autre valeur par défaut si la date candidate n'existe pas
 };
 // Hash the password before saving
 userSchema.pre("save", async function (next) {
