@@ -4,30 +4,37 @@ import * as jwtToken from "../middleware/jwt/token.js";
 import * as jwtCookie from "../middleware/jwt/cookies.js";
 
 export const checkEmailCode = catchAsync(async (req, res, next) => {
-    let response = { statusCode: 404, success: false, data: [], message: "Code invalide" }
-    if (!req.query.code && req.query.code?.length < 4) {
-        response.message = "Veuillez renseigner un code valide"
-        return res.status(404).json(response);
+    const defaultResponse = { statusCode: 404, success: false, data: [], message: "Code invalide" };
+    let foundUser = undefined;
+    if (!req.query.code || req.query.code.length < 4) {
+        defaultResponse.message = "Veuillez renseigner un code valide";
+        return res.status(404).json(defaultResponse);
     }
-    const user = await tbl_User.findOne({ emailCode: code });
-    if (!user) {
-        response.message = "Code invalide"
-        return res.status(404).json(response);
+    if (req.user && req.user._id) {
+        foundUser = await tbl_User.findOne(
+            { $and: [{ _id: req.user._id }, 
+            { emailCode: req.query.code }] 
+        }).select('+tokenId');
+    } else {
+        foundUser = await tbl_User.findOne({ emailCode: req.query.code }).select('+tokenId');
     }
-    if (user.isExpires('emailCodeExpiresAt', new Date())) {
-        response.message = "Code expire"
-        return res.status(404).json(response);
+    if (!foundUser) {
+        defaultResponse.message = "Code invalide";
+        return res.status(404).json(defaultResponse);
     }
-    user.emailCode = null;
-    user.emailCodeExpiresAt = null;
+    if (foundUser.isExpires('emailCodeExpiresAt', new Date())) {
+        defaultResponse.message = "Code expire";
+        return res.status(404).json(defaultResponse);
+    }
+    foundUser.emailCode = null;
+    foundUser.emailCodeExpiresAt = null;
     if (req.path.includes('verify/email/account')) {
-        user.isEmailVerified = true;
+        foundUser.isEmailVerified = true;
     }
-    await user.save({ new: true, runValidators: true });
+    await foundUser.save({ new: true, runValidators: true });
 
-    const attach = jwtToken.attachTokensToUser(user);
+    const attach = jwtToken.attachTokensToUser(foundUser);
     jwtCookie.attachCookies(attach.access, attach.refresh, res);
-    const respo = { statusCode: 200, success: true, data: attach, message: "Connexion réussie" };
-    return res.status(200).json(respo);
-
-})
+    const response = { statusCode: 200, success: true, data: attach, message: "Connexion réussie" };
+    return res.status(200).json(response);
+});
