@@ -60,14 +60,11 @@ export const checkPhoneCode = catchAsync(async (req, res, next) => {
         defaultResponse.message = "Code expire";
         return res.status(404).json(defaultResponse);
     }
-
     foundUser.phoneCode = null;
     foundUser.phoneCodeExpiresAt = null;
-
     if (req.path.includes('verify/phone/account')) {
         foundUser.isPhoneVerified = true;
     }
-
     await foundUser.save({ new: true, runValidators: true });
 
     const attach = jwtToken.attachTokensToUser(foundUser);
