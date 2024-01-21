@@ -22,6 +22,7 @@ export const checkEmailCode = catchAsync(async (req, res, next) => {
         defaultResponse.message = "Code invalide";
         return res.status(404).json(defaultResponse);
     }
+    console.log(foundUser)
     if (foundUser.isExpires('emailCodeExpiresAt', new Date())) {
         defaultResponse.message = "Code expire";
         return res.status(404).json(defaultResponse);

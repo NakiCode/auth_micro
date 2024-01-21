@@ -102,7 +102,7 @@ const userSchema = new mongoose.Schema(
     signature: {
       type: String,
       trim: true,
-      default: generate.generateCode(32)
+      default: generate.generateCode(10)
     },
     role: {
       type: String,
