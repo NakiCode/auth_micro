@@ -91,7 +91,7 @@ const userSchema = new mongoose.Schema(
     },
     phoneCodeExpiresAt: {
       type: Date,
-      default: timeGenerate.DefaultDateExpires()
+      //default: timeGenerate.DefaultDateExpires()
     },
     emailCodeExpiresAt: {
       type: Date,
