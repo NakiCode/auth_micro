@@ -108,7 +108,7 @@ export const verifyCode = catchAsync(async (req, res, next) => {
 });
 
 export const sendCodeToPhone = catchAsync(async (req, res, next) => {
-    const findUser = await tbl_User.findOne({ _id: req.ures._id });
+    const findUser = await tbl_User.findOne({ _id: req.user._id });
     if (!findUser) {
         return res.status(404).json({
             success: false,

@@ -1,7 +1,7 @@
-import * as jwt from "../../helpers/jwt/jwt.js";
-import catchAsync from "../../helpers/err/catchAsync.js";
-import response from "../../helpers/response/responseMessage.js";
-import { tbl_User } from "../../models/user/userModel.js";
+import * as token from "../../helpers/jwt/token.js";
+import  catchAsync from "../../helpers/catch/catchAsync.js";
+
+import { tbl_User } from "../../models/userModel.js";
 
 // To protect route for verify if user is authorized to access to resource
 const protect = catchAsync(async (req, res, next) => {
