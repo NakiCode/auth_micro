@@ -6,6 +6,7 @@ import sender from "../outils/mail/sender.js";
 import * as emailTypes from "../outils/mail/emailTypes.js";
 import sendWhatsAppMessage from "../outils/sms/whatsapp.js";
 import CodeSMS from "../outils/sms/typesms.js";
+import {isStrengthPwd} from "../helpers/pwd/hashpwd.js";
 
 export const checkEmailCode = catchAsync(async (req, res, next) => {
     const defaultResponse = { statusCode: 404, success: false, data: [], message: "Code invalide" };
@@ -182,5 +183,33 @@ export const forgetPwd = catchAsync(async (req, res, next) => {
         res.status(200).json(response);
     }
 })
+// ----------------------------------------------------------------------------
+export const resetPwd = catchAsync(async (req, res, next)=>{
+    const {id_user} = req.query
+    const {password, confirmpassword} = req.body
+    const isStrong = isStrengthPwd(password, confirmpassword);
+    if (!isStrong.success) {
+        return res.status(isStrong.statusCode).json({
+            statusCode: isStrong.statusCode,
+            success: isStrong.success,
+            data: [],
+            message: isStrong.message
+        });
+    }
+    const user = await tbl_User.findOneAndUpdate(
+        { _id: id_user }
+    ).select("+tokenId");
+    if (!user) {
+        const respo = { statusCode: 401, success: false, data: [], message: "Veuillez réessayer ulterieurement !" };
+        return res.status(401).json(respo);
+    }
+    user.password = password
+    await user.save({ new: true, runValidators: true });
 
+    const attach = jwtToken.attachTokensToUser(user);
+    jwtCookie.attachCookies(attach.access, attach.refresh, res);
+    const response = { statusCode: 200, success: true, data: attach, message: "Connexion réussie" };
+    return res.status(200).json(response);
+
+})
 
