@@ -86,14 +86,15 @@ export const addPhoneNumber = catchAsync(async (req, res, next)=>{
     const user = await tbl_User.findOneAndUpdate({$or:[{_id: req.user._id}, {_id: userId}]})
         .select("+phoneCode")
     if (!user) {
-        let respo = {statusCode: 404, data: [], message: "Veuillez vous connecter !"}
-        return res.status(404).json(respo);
+        let respo = {statusCode: 401, data: [], message: "Veuillez réessayer ultérieurement !"}
+        return res.status(401).json(respo);
     }
     user.phone = phone
     user.generateCodeAndDateTime('phoneCode', 'phoneCodeExpiresAt')
     await user.save({new: true, runValidators: true})
+
     // send sms whatsapp
-    let format = CodeSMS(user.phone, user.phoneCode)
+    let format = CodeSMS(user.phone, user.phoneCode, "VERIFICATION");
     const senderSMS = await sendWhatsAppMessage(format)
     console.log(senderSMS)
     const response = { statusCode: 200, success: true, data: [], message: "Code envoyé sur votre numèro Whatsapp." };
