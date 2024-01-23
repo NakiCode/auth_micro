@@ -58,7 +58,7 @@ const errorHandle = (err, req, res, next) => {
         const respo = response(400, false, [], "Problème d'accès au fichier");
         return res.status(400).json(respo);
     }
-    if (err.name === "MongoServerSelectionError") {
+    if (err.name === "MongooseServerSelectionError") {
         const respo = response(500, false, [], "Impossible de se connecter à la base de données MongoDB");
         return res.status(500).json(respo);
     }

@@ -10,8 +10,8 @@ export const DefaultDateExpires = () => {
   return currentDate;
 };
 
-export const isDateTimeExpires = (currentDateTime, givenDateTime) => {
-  const currentDate = moment(currentDateTime);
+export const isDateTimeExpires = (givenDateTime) => {
+  const currentDate = DateNow();
   const givenDate = moment(givenDateTime);
   const comparison = currentDate.diff(givenDate);
   return comparison > 0;

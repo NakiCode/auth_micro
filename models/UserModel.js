@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import mongoose from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 import validator from "validator";
 import * as generate from "../helpers/code/generate.js";
 import * as timeGenerate from "../helpers/date/time.js";
@@ -128,7 +128,8 @@ userSchema.methods.isMatchCode = function (candidateCode, code) {
 };
 userSchema.methods.isExpires = function (candidateDate, currentDate) {
   const { [candidateDate]: candidate } = this;
-  if (candidate) {
+  console.log(candidate, currentDate);
+  if (candidate) { 
     return timeGenerate.isDateTimeExpires(candidate, currentDate);
   }
   return false; // ou une autre valeur par défaut si la date candidate n'existe pas
