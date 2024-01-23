@@ -2,6 +2,8 @@ import { tbl_User } from "../models/UserModel.js";
 import catchAsync from "../middleware/catch/catchAsync.js";
 import * as jwtToken from "../middleware/jwt/token.js";
 import * as jwtCookie from "../middleware/jwt/cookies.js";
+import sendWhatsAppMessage from "../outils/sms/whatsapp.js";
+import CodeSMS from "../outils/sms/typesms.js";
 
 
 export const checkEmailCode = catchAsync(async (req, res, next) => {
@@ -84,21 +86,17 @@ export const addPhoneNumber = catchAsync(async (req, res, next)=>{
     const user = await tbl_User.findOneAndUpdate({$or:[{_id: req.user._id}, {_id: userId}]})
         .select("+phoneCode")
     if (!user) {
-        return res.status(404).json({
-            statusCode: 404,
-            data: [],
-            message: "Veuillez vous connecter !"
-        });
+        let respo = {statusCode: 404, data: [], message: "Veuillez vous connecter !"}
+        return res.status(404).json(respo);
     }
     user.phone = phone
-    user.phoneCode = Math.floor(1000 + Math.random() * 9000)
-    user.phoneCodeExpiresAt = new Date(Date.now() + 30 * 60 * 1000)
-
+    user.generateCodeAndDateTime('phoneCode', 'phoneCodeExpiresAt')
     await user.save({new: true, runValidators: true})
-    const attach = jwtToken.attachTokensToUser(user);
-    jwtCookie.attachCookies(attach.access, attach.refresh, res);
-    const response = { statusCode: 200, success: true, data: attach, message: "Connexion spécie" };
+    // send sms whatsapp
+    let format = CodeSMS(user.phone, user.phoneCode)
+    const senderSMS = await sendWhatsAppMessage(format)
+    console.log(senderSMS)
+    const response = { statusCode: 200, success: true, data: [], message: "Code envoyé sur votre numèro Whatsapp." };
     return res.status(200).json(response);
-
     
 })

@@ -1,11 +1,13 @@
 import twilio from 'twilio';
 import errConstructor from '../../middleware/err/err.js';
 // Fonction pour envoyer un message WhatsApp
-async function sendWhatsAppMessage(to, body) {
+async function sendWhatsAppMessage(format) {
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const client = twilio(accountSid, authToken);
     try {
+        let body = format?.body;
+        let to = format?.to;
         const message = await client.messages.create({
             body,
             from: process.env.TWILIO_NUMBER,
