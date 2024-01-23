@@ -7,7 +7,6 @@ import * as emailTypes from "../outils/mail/emailTypes.js";
 import sendWhatsAppMessage from "../outils/sms/whatsapp.js";
 import CodeSMS from "../outils/sms/typesms.js";
 
-
 export const checkEmailCode = catchAsync(async (req, res, next) => {
     const defaultResponse = { statusCode: 404, success: false, data: [], message: "Code invalide" };
     let foundUser = undefined;
@@ -44,7 +43,7 @@ export const checkEmailCode = catchAsync(async (req, res, next) => {
     const response = { statusCode: 200, success: true, data: attach, message: "Connexion réussie" };
     return res.status(200).json(response);
 });
-
+// ----------------------------------------------------------------------------
 export const checkPhoneCode = catchAsync(async (req, res, next) => {
     const defaultResponse = { statusCode: 404, success: false, data: [], message: "Code invalide" };
     let foundUser = undefined;
@@ -135,4 +134,6 @@ export const addEmail = catchAsync(async (req, res, next) => {
     });
 })
 // ----------------------------------------------------------------------------
+
+
 
