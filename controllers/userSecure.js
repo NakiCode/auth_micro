@@ -2,6 +2,8 @@ import { tbl_User } from "../models/UserModel.js";
 import catchAsync from "../middleware/catch/catchAsync.js";
 import * as jwtToken from "../middleware/jwt/token.js";
 import * as jwtCookie from "../middleware/jwt/cookies.js";
+import sender from "../outils/mail/sender.js";
+import * as emailTypes from "../outils/mail/emailTypes.js";
 import sendWhatsAppMessage from "../outils/sms/whatsapp.js";
 import CodeSMS from "../outils/sms/typesms.js";
 
@@ -89,7 +91,7 @@ export const addPhoneNumber = catchAsync(async (req, res, next) => {
         { $or: [{ _id: req.user._id }, { _id: userId }] }
     ).select("+phoneCode");
     if (!user) {
-        const respo = { statusCode: 401, success: false, data: [], message: "Veuillez réessayer ultérieurement !"};
+        const respo = { statusCode: 401, success: false, data: [], message: "Veuillez réessayer ultérieurement !" };
         return res.status(401).json(respo);
     }
     user.phone = phone;
@@ -108,4 +110,27 @@ export const addPhoneNumber = catchAsync(async (req, res, next) => {
     };
     return res.status(200).json(response);
 
+})
+// ----------------------------------------------------------------------------
+export const addEmail = catchAsync(async (req, res, next) => {
+    const { email } = req.body;
+    const userId = req.query.id_user;
+    const user = await tbl_User.findOneAndUpdate(
+        { $or: [{ _id: req.user._id }, { _id: userId }] }
+    ).select("+emailCode");
+    if (!user) {
+        const respo = { statusCode: 401, success: false, data: [], message: "Veuillez réessayer ultérieurement !" };
+        return res.status(401).json(respo);
+    }
+    user.email = email;
+    user.generateCodeAndDateTime("emailCode", "emailCodeExpiresAt");
+    await user.save({ new: true, runValidators: true });
+    const response = { statusCode: 200, success: true, data: user._id, message: "Code envoyé sur votre courriel." };
+
+    // send email asynchronously
+    const format = emailTypes.emailChangeReset;
+    format.code = user.emailCode;
+    sender(user.email, format).then(() => {
+        res.status(200).json(response);
+    });
 })
