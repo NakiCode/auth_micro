@@ -19,7 +19,7 @@ const signRefreshToken = (payload) => {
 
 const signApiKey = (payload) => {
   return jwt.sign(
-    { apiKey: payload.apiKey, type: "api", role: payload.role },
+    { apiKey: payload.signature, type: "api", role: payload.role },
     process.env.API_KEY_SECRET,
     { expiresIn: process.env.API_KEY_EXPIRES_IN }
   );
