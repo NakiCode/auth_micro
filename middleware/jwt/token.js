@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import errConstructor from '../../middleware/err/err.js';
+
 const signAccessToken = (payload) => {
   return jwt.sign(
     { _id: payload._id, type: "access", role: payload.role, tokenId: payload.tokenId },
@@ -18,7 +19,7 @@ const signRefreshToken = (payload) => {
 
 const signApiKey = (payload) => {
   return jwt.sign(
-    { apiKey: payload.apiKey, type: "api", role: payload.role },
+    { apiKey: payload.signature, type: "api", role: payload.role },
     process.env.API_KEY_SECRET,
     { expiresIn: process.env.API_KEY_EXPIRES_IN }
   );

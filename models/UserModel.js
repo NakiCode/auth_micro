@@ -126,11 +126,10 @@ userSchema.methods.checkMatchPassword = async function (candidatePassword) {
 userSchema.methods.isMatchCode = function (candidateCode, code) {
   return this[candidateCode] === code ? true : false;
 };
-userSchema.methods.isExpires = function (candidateDate, currentDate) {
+userSchema.methods.isExpires = function (candidateDate) {
   const { [candidateDate]: candidate } = this;
-  console.log(candidate, currentDate);
-  if (candidate) { 
-    return timeGenerate.isDateTimeExpires(candidate, currentDate);
+  if (candidate) {
+    return timeGenerate.isDateTimeExpires(candidate);
   }
   return false; // ou une autre valeur par défaut si la date candidate n'existe pas
 };

@@ -24,7 +24,6 @@ const createCookieToken = (name, value, expires, res) => {
     if (!value || !res) {
         throw new errConstructor("CookieError", 'Invalid parameters', 400);
     }
-
     const cookieOptions = getCookieOptions(expires);
     res.cookie(name, value, cookieOptions);
 };
