@@ -134,6 +134,53 @@ export const addEmail = catchAsync(async (req, res, next) => {
     });
 })
 // ----------------------------------------------------------------------------
+export const forgetPwd = catchAsync(async (req, res, next) => {
+    const { email, phone } = req.body;
+    if (!email && !phone) {
+        const respo = { statusCode: 401, success: false, data: [], message: "Veuillez renseigner un email ou un numéro de whatsapp !" };
+        return res.status(401).json(respo);
+    }
+    if (email) {
+        const user = await tbl_User.findOneAndUpdate(
+            { email: email }
+        ).select("+emailCode");
+        if (!user) {
+            const respo = { statusCode: 401, success: false, data: [], message: "Veuillez réessayer ultérieurement !" };
+            return res.status(401).json(respo);
+        }
+        user.generateCodeAndDateTime("emailCode", "emailCodeExpiresAt");
+        await user.save();
+        const response = {
+            statusCode: 200, success: true, data: user._id, message: "Code envoyé sur votre courriel."
+        };
+        // send email asynchronously
+        const format = emailTypes.emailCheckResetPassword;
+        format.code = user.emailCode;
+        sender(user.email, format).then(() => {
+            res.status(200).json(response);
+        });
+    }
+    if (phone) {
+        const user = await tbl_User.findOneAndUpdate(
+            { phone: phone }
+        ).select("+phoneCode");
+        if (!user) {
+            const respo = { statusCode: 401, success: false, data: [], message: "Veuillez réessayer ultérieurement !" };
+            return res.status(401).json(respo);
+        }
+        user.generateCodeAndDateTime("phoneCode", "phoneCodeExpiresAt");
+        await user.save();
+        const response = {
+            statusCode: 200, success: true, data: user._id, message: "Code envoyé sur votre whatsapp."
+        };
+        // send sms whatsapp asynchronously
+        const format = CodeSMS(user.phone, user.phoneCode, "RESET_PWD");
+        sendWhatsAppMessage(format).then(senderSMS => {
+            console.log(senderSMS);
+        });
 
+        res.status(200).json(response);
+    }
+})
 
 
