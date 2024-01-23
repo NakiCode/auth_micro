@@ -126,6 +126,16 @@ userSchema.methods.checkMatchPassword = async function (candidatePassword) {
 userSchema.methods.isMatchCode = function (candidateCode, code) {
   return this[candidateCode] === code ? true : false;
 };
+// generate a random code to phoneCode
+userSchema.methods.generateCodeAndDateTime = function(codeField, datetimeField ){
+  const { [codeField]: code, [datetimeField]: datetime } = this;
+  if (!code) {
+    this[codeField] = generate.generateCode(6);
+  }
+  if (!datetime) {
+    this[datetimeField] = timeGenerate.DefaultDateExpires();
+  }
+}
 userSchema.methods.isExpires = function (candidateDate) {
   const { [candidateDate]: candidate } = this;
   if (candidate) {
