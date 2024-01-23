@@ -15,9 +15,10 @@ export const checkEmailCode = catchAsync(async (req, res, next) => {
     }
     if (req.user && req.user._id) {
         foundUser = await tbl_User.findOne(
-            { $and: [{ _id: req.user._id }, 
-            { emailCode: req.query.code }] 
-        }).select('+tokenId +emailCode');
+            {
+                $and: [{ _id: req.user._id },
+                { emailCode: req.query.code }]
+            }).select('+tokenId +emailCode');
     } else {
         foundUser = await tbl_User.findOne({ emailCode: req.query.code }).select('+tokenId  +emailCode');
     }
@@ -52,9 +53,10 @@ export const checkPhoneCode = catchAsync(async (req, res, next) => {
     }
     if (req.user && req.user._id) {
         foundUser = await tbl_User.findOne(
-            { $and: [{ _id: req.user._id }, 
-            { phoneCode: req.query.code }] 
-        }).select('+tokenId +phoneCode');
+            {
+                $and: [{ _id: req.user._id },
+                { phoneCode: req.query.code }]
+            }).select('+tokenId +phoneCode');
     } else {
         foundUser = await tbl_User.findOne({ phoneCode: req.query.code }).select('+tokenId +phoneCode');
     }
@@ -80,24 +82,30 @@ export const checkPhoneCode = catchAsync(async (req, res, next) => {
 
 });
 // ----------------------------------------------------------------------------
-export const addPhoneNumber = catchAsync(async (req, res, next)=>{
-    const {phone} = req.body
-    const userId = req.query.id_user
-    const user = await tbl_User.findOneAndUpdate({$or:[{_id: req.user._id}, {_id: userId}]})
-        .select("+phoneCode")
+export const addPhoneNumber = catchAsync(async (req, res, next) => {
+    const { phone } = req.body;
+    const userId = req.query.id_user;
+    const user = await tbl_User.findOneAndUpdate(
+        { $or: [{ _id: req.user._id }, { _id: userId }] }
+    ).select("+phoneCode");
     if (!user) {
-        let respo = {statusCode: 401, success: false, data: [], message: "Veuillez réessayer ultérieurement !"}
+        const respo = { statusCode: 401, success: false, data: [], message: "Veuillez réessayer ultérieurement !"};
         return res.status(401).json(respo);
     }
-    user.phone = phone
-    user.generateCodeAndDateTime('phoneCode', 'phoneCodeExpiresAt')
-    await user.save({new: true, runValidators: true})
-
-    // send sms whatsapp
-    let format = CodeSMS(user.phone, user.phoneCode, "VERIFICATION");
-    const senderSMS = await sendWhatsAppMessage(format)
-    console.log(senderSMS)
-    const response = { statusCode: 200, success: true, data: user._id, message: "Code envoyé sur votre numèro Whatsapp."};
+    user.phone = phone;
+    user.generateCodeAndDateTime("phoneCode", "phoneCodeExpiresAt");
+    await user.save({ new: true, runValidators: true });
+    // send sms whatsapp asynchronously
+    const format = CodeSMS(user.phone, user.phoneCode, "VERIFICATION");
+    sendWhatsAppMessage(format).then(senderSMS => {
+        console.log(senderSMS);
+    });
+    const response = {
+        statusCode: 200,
+        success: true,
+        data: user._id,
+        message: "Code envoyé sur votre numéro Whatsapp."
+    };
     return res.status(200).json(response);
-    
+
 })
