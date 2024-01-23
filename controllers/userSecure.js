@@ -1,12 +1,12 @@
-import { tbl_User } from "../models/UserModel.js";
-import catchAsync from "../middleware/catch/catchAsync.js";
 import * as jwtToken from "../middleware/jwt/token.js";
 import * as jwtCookie from "../middleware/jwt/cookies.js";
-import sender from "../outils/mail/sender.js";
 import * as emailTypes from "../outils/mail/emailTypes.js";
+import { tbl_User } from "../models/UserModel.js";
+import {isStrengthPwd} from "../helpers/pwd/hashpwd.js";
+import catchAsync from "../middleware/catch/catchAsync.js";
+import sender from "../outils/mail/sender.js";
 import sendWhatsAppMessage from "../outils/sms/whatsapp.js";
 import CodeSMS from "../outils/sms/typesms.js";
-import {isStrengthPwd} from "../helpers/pwd/hashpwd.js";
 
 export const checkEmailCode = catchAsync(async (req, res, next) => {
     const defaultResponse = { statusCode: 404, success: false, data: [], message: "Code invalide" };
