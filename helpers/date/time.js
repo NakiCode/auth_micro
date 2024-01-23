@@ -12,9 +12,7 @@ export const DefaultDateExpires = () => {
 
 export const isDateTimeExpires = (givenDateTime) => {
   const currentDate = moment()
-  console.log(currentDate)
   const givenDate = moment(givenDateTime);
   const comparison = currentDate.diff(givenDate);
-  console.log(comparison)
   return comparison > 0;
 };
