@@ -24,7 +24,7 @@ export const createUser = catchAsync(async (req, res, next) => {
     res.status(201).json({
         statusCode: 201,
         success: true,
-        data: null,
+        data: user._id,
         message: "Compte crée avec succes. Un mail de varification est envoyé sur votre boite mail !"
     });
     // send email
