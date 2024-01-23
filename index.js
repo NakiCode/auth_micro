@@ -13,6 +13,7 @@ import cookieParser from "cookie-parser";
 import errorHandle from "./middleware/err/errHendle.js";
 import toobusyProtect from "./middleware/secure/toobusy.js";
 import userRoute from "./routes/userRoute.js";
+import errConstructor from './middleware/err/err.js';
 
 // Configuration
 dotenv.config();
@@ -57,7 +58,7 @@ if (process.env.NODE_ENV === "development") {
             if (whitelist.includes(origin)) {
                 callback(null, true);
             } else {
-                callback(new Error("Access denied by CORS"));
+                callback(new errConstructor("CorsError", "Access denied by CORS", 401));
             }
         },
     };

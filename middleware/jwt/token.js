@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import errConstructor from '../../middleware/err/err.js';
+
 const signAccessToken = (payload) => {
   return jwt.sign(
     { _id: payload._id, type: "access", role: payload.role, tokenId: payload.tokenId },
