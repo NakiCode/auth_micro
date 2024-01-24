@@ -82,7 +82,7 @@ const userSchema = new mongoose.Schema(
         phoneCode: {
             type: String,
             trim: true,
-            default: generate.generateCode(6),
+            //default: generate.generateCode(6),
             select: false
         },
         emailCode: {
@@ -137,7 +137,7 @@ userSchema.methods.generateCodeAndDateTime = function (codeField, datetimeField)
 }
 userSchema.methods.isExpires = function (candidateDate) {
     const { [candidateDate]: candidate } = this;
-    if (candidate) {
+    if (candidate && candidate instanceof Date) {
         return timeGenerate.isDateTimeExpires(candidate);
     }
     return false; // ou une autre valeur par défaut si la date candidate n'existe pas
