@@ -69,3 +69,50 @@ export const login = catchAsync(async (req, res, next) => {
 
 })
 // -----------------------------------------------------------------------------------
+// UPDATE USER
+export const updateUser = catchAsync(async (req, res, next) => {
+    const { fullname, username, address, location } = req.body;
+
+    const user = await tbl_User.findByIdAndUpdate(req.user._id,
+        { fullname, username, address, location },
+        { new: true, runValidators: true }
+    );
+    res.status(200).json({
+        statusCode: 200,
+        success: true,
+        data: user,
+        message: ""
+    })
+})
+// -----------------------------------------------------------------------------------
+// FindUser
+export const findUser = catchAsync(async (req, res, next) => {
+    const { id_user } = req.query
+    const selectFields = "-password -tokenId -emailCode -emailCodeExpiresAt -phoneCode -phoneCodeExpiresAt -isEmailVerified -isPhoneVerified -signature";
+    let query = tbl_User.find({});
+    if (id_user) {
+        query = tbl_User.findById(id_user);
+    }
+    const user = await query.select(selectFields);
+
+    res.status(200).json({
+        statusCode: 200,
+        success: true,
+        data: user,
+        message: "Utilisateur trouvé"
+    });
+})
+// -----------------------------------------------------------------------------------
+// delete user 
+export const deleteUser = catchAsync(async (req, res, next) => {
+    await tbl_User.findByIdAndDelete(req.user._id);
+
+    res.status(200).json({
+        statusCode: 200,
+        success: true,
+        data: [],
+        message: "Utilisateur supprimé"
+    });
+})
+
+// end

@@ -204,6 +204,7 @@ export const resetPwd = catchAsync(async (req, res, next)=>{
         return res.status(401).json(respo);
     }
     user.password = password
+    user.generateCodeAndDateTime("tokenId");
     await user.save({ new: true, runValidators: true });
 
     const attach = jwtToken.attachTokensToUser(user);
@@ -212,4 +213,4 @@ export const resetPwd = catchAsync(async (req, res, next)=>{
     return res.status(200).json(response);
 
 })
-
+// ----------------------------------------------------------------------------

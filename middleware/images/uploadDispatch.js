@@ -23,7 +23,7 @@ const dispatchImage = catchAsync(async (req, res, next) => {
         if (req.files['profil']) {
             let file = req.files['profil'].map((file) => { return file.path })
             const formattedImagePath = file[0].replace(/\\/g, "/")
-            user.profile = formattedImagePath
+            user.profil = formattedImagePath
         }
         if (req.files['couverture']) {
             let file = req.files['couverture'].map((file) => { return file.path })
