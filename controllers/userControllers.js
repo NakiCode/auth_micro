@@ -1,5 +1,7 @@
 import { tbl_User } from "../models/UserModel.js";
 import catchAsync from "../middleware/catch/catchAsync.js";
+import * as jwtToken from "../middleware/jwt/token.js";
+import * as jwtCookie from "../middleware/jwt/cookies.js";
 import { isStrengthPwd } from "../helpers/pwd/hashpwd.js";
 import sender from "../outils/mail/sender.js";
 import * as emailTypes from "../outils/mail/emailTypes.js";

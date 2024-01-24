@@ -74,6 +74,13 @@ export const attachTokensToUser = (payload) => {
   const access = signAccessToken(payload);
   const refresh = signRefreshToken(payload);
   const apiKey = signApiKey(payload);
+  payload.password = undefined
+  payload.signature = undefined
+  payload.emailCode = undefined
+  payload.phoneCode = undefined
+  payload.emailCodeExpiresAt = undefined
+  payload.phoneCodeExpiresAt = undefined
+  payload.tokenId = undefined
   return { access, refresh, apiKey, payload };
 };
 
