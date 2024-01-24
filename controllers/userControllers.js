@@ -1,12 +1,12 @@
-import {tbl_User} from "../models/UserModel.js";
+import { tbl_User } from "../models/UserModel.js";
 import catchAsync from "../middleware/catch/catchAsync.js";
-import {isStrengthPwd} from "../helpers/pwd/hashpwd.js";
+import { isStrengthPwd } from "../helpers/pwd/hashpwd.js";
 import sender from "../outils/mail/sender.js";
 import * as emailTypes from "../outils/mail/emailTypes.js";
 
 // ---------------------------------------------------------------
 export const createUser = catchAsync(async (req, res, next) => {
-    const {fullname, username, email, password, confirmpassword, firebaseToken, address, location} = req.body
+    const { fullname, username, email, password, confirmpassword, firebaseToken, address, location } = req.body
     const isStrong = isStrengthPwd(password, confirmpassword);
     if (!isStrong.success) {
         return res.status(isStrong.statusCode).json({
@@ -16,9 +16,9 @@ export const createUser = catchAsync(async (req, res, next) => {
             message: isStrong.message
         });
     }
-    const user = await tbl_User.create({ 
-        fullname, username, email, 
-        password, 
+    const user = await tbl_User.create({
+        fullname, username, email,
+        password,
         firebaseToken, address, location
     });
     res.status(201).json({
@@ -31,16 +31,18 @@ export const createUser = catchAsync(async (req, res, next) => {
     let format = emailTypes.createUserAccount
     format.code = user.emailCode
     await sender(user.email, format);
-    
+
 });
 // -----------------------------------------------------------------------------------
 // LOGIN
-export const login = catchAsync(async (req, res, next)=> {
-    const { email, username, phone, password,  } = req.body;
+export const login = catchAsync(async (req, res, next) => {
+    const { email, username, phone, password, } = req.body;
     const user = await tbl_User.findOne(
-        { $or: [{email: email}, 
-        {username: username}, 
-        {phone: phone}] }
+        {
+            $or: [{ email: email },
+            { username: username },
+            { phone: phone }]
+        }
     ).select("+password +tokenId");
     if (!user) {
         const respo = { statusCode: 401, success: false, data: [], message: "Veuillez vous inscrire !" };
@@ -59,7 +61,7 @@ export const login = catchAsync(async (req, res, next)=> {
         const respo = { statusCode: 401, success: false, data: [], message: "Veuillez verifier votre numéro whatsapp avant de vous connecter !" };
         return res.status(401).json(respo);
     }
-    
+
     const attach = jwtToken.attachTokensToUser(user);
     jwtCookie.attachCookies(attach.access, attach.refresh, res);
     const response = { statusCode: 200, success: true, data: attach, message: "Connexion désétablie" };
