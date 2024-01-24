@@ -6,13 +6,15 @@ const dispatchImage = catchAsync(async (req, res, next) => {
     if (!user) {
         return res.status(404).json({
             statusCode: 404,
+            success: false,
             data: [],
-            message: "Veuillez vous recommencer !"
+            message: "Veuillez recommencer ultérieurement !"
         });
     };
     if (!req.files) {
         return res.status(404).json({
             statusCode: 404,
+            success: false,
             data: [],
             message: "Veuillez ajouter une photo"
         });
@@ -31,12 +33,14 @@ const dispatchImage = catchAsync(async (req, res, next) => {
         const profil = await user.save({ new: true, runValidators: true });
         return res.status(200).json({
             statusCode: 200,
+            success: true,
             data: profil,
             message: "Ajout avec succes !"
         });
     } else {
         return res.status(400).json({
             statusCode: 400,
+            success: false,
             data: [],
             message: "Veuillez ajouter une photo"
         });
