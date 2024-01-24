@@ -1,4 +1,4 @@
-import catchAsync from "../../helpers/err/catchAsync.js";
+import catchAsync from "../catch/catchAsync.js"
 import { tbl_User } from "../../models/UserModel.js";
 
 const dispatchImage = catchAsync(async (req, res, next) => {

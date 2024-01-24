@@ -1,6 +1,7 @@
 import * as userController from "../controllers/userControllers.js";
 import * as userSecure from "../controllers/userSecure.js";
-
+import dispatchImage from "../middleware/images/uploadDispatch.js";
+import uploadImage from "../middleware/images/uploadImage.js";
 import express from "express";
 
 const router = express.Router();

@@ -26,7 +26,7 @@ const fileFilter = function (req, file, cb) {
 };
 
 // Middleware d'upload d'image
-export const uploadImage = multer({
+const uploadImage = multer({
     storage: storage,
     limits: {
         fileSize: 3 * 1024 * 1024 // Limiter la taille du fichier à 5 Mo
@@ -37,3 +37,4 @@ export const uploadImage = multer({
     { name: 'couverture', maxCount: 1 }
 ]);
 
+export default uploadImage;

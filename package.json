@@ -41,6 +41,7 @@
     "sharp": "^0.33.2",
     "toobusy-js": "^0.5.1",
     "twilio": "^4.20.1",
+    "uuid": "^9.0.1",
     "validator": "^13.11.0"
   },
   "devDependencies": {
