@@ -28,10 +28,10 @@ app.use(express.static("files"));
 app.use(cookieParser());
 
 if (process.env.NODE_ENV === "production") {
-    const accessLogStream = fs.createWriteStream('access.log', { flags: 'a' });
+    const accessLogStream = fs.createWriteStream('/log/journal.log', { flags: 'a' });
     app.use(morgan('combined', { stream: accessLogStream }));
 } else {
-    app.use(morgan("combined"));
+    app.use(morgan("dev"));
 }
 
 app.use(helmet());
