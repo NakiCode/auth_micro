@@ -1,10 +1,11 @@
 import crypto from 'crypto';
-export const generateCode = (codeLength = 8) => {
-    try {
-        const randomBytes = crypto.randomBytes(codeLength);
-        const code = parseInt(randomBytes.toString('hex'), 16).toString().slice(0, codeLength);
-        return code;
-    } catch (error) {
-        return '0770';
+export const generateCode = (length = 8) => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const randomBytes = crypto.randomBytes(length);
+    let code = '';
+    for (let i = 0; i < randomBytes.length; i++) {
+        const randomIndex = randomBytes[i] % characters.length;
+        code += characters.charAt(randomIndex);
     }
+    return code;
 };

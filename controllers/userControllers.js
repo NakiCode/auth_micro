@@ -34,4 +34,35 @@ export const createUser = catchAsync(async (req, res, next) => {
     
 });
 // -----------------------------------------------------------------------------------
-// 
+// LOGIN
+export const login = catchAsync(async (req, res, next)=> {
+    const { email, username, phone, password,  } = req.body;
+    const user = await tbl_User.findOne(
+        { $or: [{email: email}, 
+        {username: username}, 
+        {phone: phone}] }
+    ).select("+password +tokenId");
+    if (!user) {
+        const respo = { statusCode: 401, success: false, data: [], message: "Veuillez vous inscrire !" };
+        return res.status(401).json(respo);
+    }
+    const isMatch = await user.checkMatchPassword(password);
+    if (!isMatch) {
+        const respo = { statusCode: 401, success: false, data: [], message: "Vos informations d'authentification sont incorrect !" };
+        return res.status(401).json(respo);
+    }
+    if (!user.isEmailVerified) {
+        const respo = { statusCode: 200, success: true, data: [], message: "Veuillez verifier votre adresse email avant de vous connecter!" };
+        return res.status(200).json(respo);
+    }
+    if (!user.isPhoneVerified) {
+        const respo = { statusCode: 401, success: false, data: [], message: "Veuillez verifier votre numéro whatsapp avant de vous connecter !" };
+        return res.status(401).json(respo);
+    }
+    
+    const attach = jwtToken.attachTokensToUser(user);
+    jwtCookie.attachCookies(attach.access, attach.refresh, res);
+    const response = { statusCode: 200, success: true, data: attach, message: "Connexion désétablie" };
+    return res.status(200).json(response);
+
+})
