@@ -114,10 +114,7 @@ export const addPhoneNumber = catchAsync(async (req, res, next) => {
 // ----------------------------------------------------------------------------
 export const addEmail = catchAsync(async (req, res, next) => {
     const { email } = req.body;
-    const userId = req.query.id_user;
-    const user = await tbl_User.findOneAndUpdate(
-        { $or: [{ _id: req.user._id }, { _id: userId }] }
-    ).select("+emailCode");
+    const user = await tbl_User.findOne({ _id: req.user._id }).select("+emailCode");
     if (!user) {
         const respo = { statusCode: 401, success: false, data: [], message: "Veuillez réessayer ultérieurement !" };
         return res.status(401).json(respo);
@@ -136,7 +133,7 @@ export const addEmail = catchAsync(async (req, res, next) => {
 })
 // ----------------------------------------------------------------------------
 export const forgetPwd = catchAsync(async (req, res, next) => {
-    const { email, phone } = req.body;
+    const { email, phone } = req.query;
     if (!email && !phone) {
         const respo = { statusCode: 401, success: false, data: [], message: "Veuillez renseigner un email ou un numéro de whatsapp !" };
         return res.status(401).json(respo);
