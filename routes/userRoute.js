@@ -28,6 +28,6 @@ router.get("/forget/pwd", userSecure.forgetPwd);
 router.post("/reset/pwd", userSecure.resetPwd);
 router.get("/refresh", refresh);
 // UPLOAD IMAGE
-router.post("/upload/image", [protect, uploadImage], dispatchImage);
+router.patch("/upload/image", [protect, uploadImage], dispatchImage);
 
 export default router;
