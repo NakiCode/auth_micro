@@ -16,13 +16,15 @@ const protect = catchAsync(async (req, res, next) => {
         token = req.headers.authorization.split(' ')[1];
     }
     if (!token) {
+        console.log("not token")
         return handleUnauthorized(res, "Veuillez vous reconnecter");
     }
+    
     const verifyToken = await jwtToken.verifyAccessToken(token);
     if (!verifyToken) {
         return handleUnauthorized(res, "Veuillez vous reconnecter");
     }
-    const user = await tbl_User.findOne({ _id: verifyToken.id, tokenId: verifyToken.tokenId });
+    const user = await tbl_User.findOne({ _id: verifyToken._id, tokenId: verifyToken.tokenId });
     if (!user) {
         return handleUnauthorized(res, "Veuillez vous reconnecter");
     }

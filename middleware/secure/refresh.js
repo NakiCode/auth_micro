@@ -22,7 +22,7 @@ export const refresh = catchAsync(async (req, res, next) => {
   if (!verifyRefreshToken) {
     return handleUnauthorized(res, "Veuillez vous connecter");
   }
-  const user = await tbl_User.findById(verifyRefreshToken.id).select('+tokenId');
+  const user = await tbl_User.findById(verifyRefreshToken._id).select('+tokenId');
   if (!user) {
     return handleNotFound(res, "Utilisateur non trouvé");
   }
