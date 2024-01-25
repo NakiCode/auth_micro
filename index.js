@@ -72,7 +72,7 @@ app.use(`${process.env.BASE_URL}/user`, userRoute);
 // Middleware de gestion des erreurs
 app.use(errorHandle);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 // Connexion à la base de données
 dbConnect();

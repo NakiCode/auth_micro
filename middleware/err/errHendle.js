@@ -59,7 +59,7 @@ const errorHandle = (err, req, res, next) => {
         return res.status(400).json(respo);
     }
     if(err.name === "TokenExpiredError"){
-        const respo = response(400, false, [], "Veuillez vous connecter à nouveau");
+        const respo = response(400, false, [], err.message);
         return res.status(400).json(respo);
     }
     if (err.name === "MongooseServerSelectionError") {

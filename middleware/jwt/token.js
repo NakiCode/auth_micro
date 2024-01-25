@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import errConstructor from '../../middleware/err/err.js';
+import moment from 'moment';
 
 const signAccessToken = (payload) => {
   return jwt.sign(
@@ -80,11 +81,12 @@ export const attachTokensToUser = (payload) => {
   payload.phoneCode = undefined
   payload.emailCodeExpiresAt = undefined
   payload.phoneCodeExpiresAt = undefined
+  payload.username = undefined
   payload.tokenId = undefined
   return { access, refresh, apiKey, payload };
 };
 
 const isTokenExpired = (expirationTime) => {
-  const currentTime = Math.floor(Date.now() / 1000);
+  const currentTime = Math.floor(moment() / 1000);
   return currentTime > expirationTime;
 };
