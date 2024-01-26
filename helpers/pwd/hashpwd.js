@@ -62,12 +62,3 @@ export const isStrengthPwd = (password, confirmpassword) => {
     return strong;
 };
 
-
-// JWT_EXPIRES_IN = 1d
-// JWT_REFRESH_EXPIRES_IN = 3d
-// JWT_COOKIE_TOKEN_EXPIRES_IN = 1
-// JWT_COOKIE_REFRESH_EXPIRES_IN = 1
-// JWT_SECRET = @@@kabikaNakicode0707@@
-// JWT_REFRESH_SECRET = @@@kabikaNakicode0707@@
-// API_KEY_SECRET = @@@kabikaNakicode0707@@
-// API_KEY_EXPIRES_IN = 90d
