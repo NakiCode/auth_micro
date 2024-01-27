@@ -38,10 +38,7 @@ export const checkEmailCode = catchAsync(async (req, res, next) => {
         foundUser.isEmailVerified = true;
     }
     await foundUser.save({ new: true, runValidators: true });
-
-    const attach = jwtToken.attachTokensToUser(foundUser);
-    jwtCookie.attachCookies(attach.access, attach.refresh, res);
-    const response = { statusCode: 200, success: true, data: attach, message: "Connexion réussie" };
+    const response = { statusCode: 200, success: true, data: {_id:foundUser._id}, message: "Connexion réussie" };
     return res.status(200).json(response);
 });
 // ----------------------------------------------------------------------------
@@ -77,9 +74,8 @@ export const checkPhoneCode = catchAsync(async (req, res, next) => {
     }
     await foundUser.save({ new: true, runValidators: true });
 
-    const attach = jwtToken.attachTokensToUser(foundUser);
-    jwtCookie.attachCookies(attach.access, attach.refresh, res);
-    const response = { statusCode: 200, success: true, data: attach, message: "Connexion réussie" };
+    const response = { statusCode: 200, success: true, data: {_id:foundUser._id}, message: "Connexion réussie" };
+    return res.status(200).json(response);
     return res.status(200).json(response);
 
 });
