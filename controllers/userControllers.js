@@ -55,18 +55,14 @@ export const login = catchAsync(async (req, res, next) => {
         const respo = { statusCode: 401, success: false, data: [], message: "Vos informations d'authentification sont incorrect !" };
         return res.status(401).json(respo);
     }
-    if (!user.isEmailVerified) {
-        const respo = { statusCode: 200, success: true, data: [], message: "Veuillez verifier votre adresse email avant de vous connecter!" };
+    if (!user.isEmailVerified && !user.isPhoneVerified) {
+        const respo = { statusCode: 200, success: true, data: [], message: "Veuillez verifier votre adresse email ou votre numéro whatsapp avant de vous connecter!" };
         return res.status(200).json(respo);
-    }
-    if (!user.isPhoneVerified) {
-        const respo = { statusCode: 401, success: false, data: [], message: "Veuillez verifier votre numéro whatsapp avant de vous connecter !" };
-        return res.status(401).json(respo);
     }
 
     const attach = jwtToken.attachTokensToUser(user);
     jwtCookie.attachCookies(attach.access, attach.refresh, res);
-    const response = { statusCode: 200, success: true, data: attach, message: "Connexion désétablie" };
+    const response = { statusCode: 200, success: true, data: attach, message: "Connexion établie" };
     return res.status(200).json(response);
 
 })
