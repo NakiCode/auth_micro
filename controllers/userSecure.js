@@ -81,8 +81,9 @@ export const checkPhoneCode = catchAsync(async (req, res, next) => {
 // ----------------------------------------------------------------------------
 export const addPhoneNumber = catchAsync(async (req, res, next) => {
     const { phone } = req.body;
+    
     const userId = req.query.id_user;
-    const user = await tbl_User.findOneAndUpdate(
+    const user = await tbl_User.findOne(
         { $or: [{ _id: req.user._id }, { _id: userId }] }
     ).select("+phoneCode");
     if (!user) {

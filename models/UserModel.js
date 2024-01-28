@@ -1,9 +1,12 @@
 import bcrypt from "bcrypt";
 import mongoose, { Mongoose } from "mongoose";
 import validator from "validator";
+import { v4 as uuidv4 } from 'uuid'
 import * as generate from "../helpers/code/generate.js";
 import * as timeGenerate from "../helpers/date/time.js";
 import * as hashpwd from "../helpers/pwd/hashpwd.js";
+import * as firebase from "../outils/firebase/firebase.js";
+
 const errorMessages = {
     required: "The {PATH} is required",
     minLength: "The {PATH} must be at least {MINLENGTH} characters",
@@ -101,7 +104,7 @@ const userSchema = new mongoose.Schema(
         signature: {
             type: String,
             trim: true,
-            default: generate.generateCode(14)
+            default: uuidv4()
         },
         role: {
             type: String,
@@ -152,5 +155,21 @@ userSchema.pre("save", async function (next) {
         next(error);
     }
 });
+
+userSchema.pre("save", async function (next) {
+    if (!this.isModified("firebaseToken")) return next();
+    try {
+        // Obtention du tokenId de Firebase
+        const token = await admin.messaging().getToken(this._id);
+        // Création d'un nouveau tokenId de Firebase si nécessaire
+        if (!token) {
+            token = await admin.messaging().createToken();
+        }
+        this.firebaseToken = token;
+        next();
+    } catch (error) {
+        next(error);
+    }
+})
 
 export const tbl_User = mongoose.model("tbl_User", userSchema);

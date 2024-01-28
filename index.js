@@ -31,7 +31,7 @@ if (process.env.NODE_ENV === "production") {
     const accessLogStream = fs.createWriteStream('/log/journal.log', { flags: 'a' });
     app.use(morgan('combined', { stream: accessLogStream }));
 } else {
-    app.use(morgan("dev"));
+    app.use(morgan("combined"));
 }
 
 app.use(helmet());
@@ -42,6 +42,7 @@ app.use(mongoSanitize());
 app.use(express.urlencoded({ extended: true, limit: "3kb" }));
 
 app.use(express.static("files/"));
+
 
 if (process.env.NODE_ENV === "production") {
     app.use(express.static("client/build"));
