@@ -53,8 +53,15 @@ export const isCookiesExpired = (req) => {
     return false;
 };
 
+export const deleteCookies = (res) => {
+    res.clearCookie(COOKIE_NAMES.JWT);
+    res.clearCookie(COOKIE_NAMES.JWT_REFRESH);
+    return res;
+}
+
 export default {
     COOKIE_NAMES,
+    deleteCookies,
     attachCookies,
     isCookiesExpired
 };

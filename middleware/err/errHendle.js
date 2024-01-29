@@ -83,6 +83,10 @@ const errorHandle = (err, req, res, next) => {
         const respo = response(400, false, [], "Requête invalide");
         return res.status(400).json(respo);
     }
+    if (err.name === "FileFormatError") {
+        const respo = response(400, false, [], err.message);
+        return res.status(400).json(respo);
+    }
     if (err instanceof Error) {
         const respo = response(500, false, [], "Un problème est survenu");
         return res.status(500).json(respo);

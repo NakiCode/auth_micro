@@ -12,6 +12,7 @@ const router = express.Router();
 // CONTROLLERS
 router.post("/signup", userController.createUser);
 router.post("/login", userController.login);
+router.get("/logout", protect, userSecure.logout);
 router.patch("/update", protect, userController.updateUser);
 router.get("/find", protect, userController.findUser);
 router.delete("/delete", protect, userController.deleteUser);
@@ -27,6 +28,7 @@ router.patch("/add/email", protect, userSecure.addEmail);
 router.get("/forget/pwd", userSecure.forgetPwd);
 router.post("/reset/pwd", userSecure.resetPwd);
 router.get("/refresh", refresh);
+
 // UPLOAD IMAGE
 router.patch("/upload/image", [protect, uploadImage], dispatchImage);
 

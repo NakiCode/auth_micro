@@ -33,7 +33,7 @@ if (process.env.NODE_ENV === "production") {
   });
   app.use(morgan("combined", { stream: accessLogStream }));
 } else {
-  app.use(morgan("tony", { stream: process.stdout }));
+  app.use(morgan("dev"));
 }
 
 app.use(helmet());
