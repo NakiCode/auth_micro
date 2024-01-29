@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import moment from "moment-timezone";
 import dbConnect from "./config/db.js";
 import morgan from "morgan";
-import fs from 'fs';
+import fs from "fs";
 import cors from "cors";
 import helmet from "helmet";
 import hpp from "hpp";
@@ -13,7 +13,7 @@ import cookieParser from "cookie-parser";
 import errorHandle from "./middleware/err/errHendle.js";
 import toobusyProtect from "./middleware/secure/toobusy.js";
 import userRoute from "./routes/userRoute.js";
-import errConstructor from './middleware/err/err.js';
+import errConstructor from "./middleware/err/err.js";
 
 // Configuration
 dotenv.config();
@@ -28,10 +28,12 @@ app.use(express.static("files"));
 app.use(cookieParser());
 
 if (process.env.NODE_ENV === "production") {
-    const accessLogStream = fs.createWriteStream('/log/journal.log', { flags: 'a' });
-    app.use(morgan('combined', { stream: accessLogStream }));
+  const accessLogStream = fs.createWriteStream("/log/journal.log", {
+    flags: "a"
+  });
+  app.use(morgan("combined", { stream: accessLogStream }));
 } else {
-    app.use(morgan("combined"));
+  app.use(morgan("tony", { stream: process.stdout }));
 }
 
 app.use(helmet());
@@ -43,27 +45,27 @@ app.use(express.urlencoded({ extended: true, limit: "3kb" }));
 
 app.use(express.static("files/"));
 
-
 if (process.env.NODE_ENV === "production") {
-    app.use(express.static("client/build"));
+  app.use(express.static("client/build"));
 }
 
 app.enable("trust proxy");
+app.disable("x-powered-by");
 
 if (process.env.NODE_ENV === "development") {
-    app.use(cors());
+  app.use(cors());
 } else if (process.env.NODE_ENV === "production") {
-    const whitelist = ["*"];
-    const corsOptions = {
-        origin: function (origin, callback) {
-            if (whitelist.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new errConstructor("CorsError", "Access denied by CORS", 401));
-            }
-        },
-    };
-    app.use(cors(corsOptions));
+  const whitelist = ["*"];
+  const corsOptions = {
+    origin: function (origin, callback) {
+      if (whitelist.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new errConstructor("CorsError", "Access denied by CORS", 401));
+      }
+    }
+  };
+  app.use(cors(corsOptions));
 }
 
 app.use(hpp());
@@ -79,5 +81,5 @@ const PORT = process.env.PORT || 5000;
 dbConnect();
 
 app.listen(PORT, () => {
-    console.log(`Le serveur écoute sur le port : ${PORT}`);
+  console.log(`Le serveur écoute sur le port : ${PORT}`);
 });
