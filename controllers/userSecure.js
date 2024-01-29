@@ -38,10 +38,7 @@ export const checkEmailCode = catchAsync(async (req, res, next) => {
         foundUser.isEmailVerified = true;
     }
     await foundUser.save({ new: true, runValidators: true });
-
-    const attach = jwtToken.attachTokensToUser(foundUser);
-    jwtCookie.attachCookies(attach.access, attach.refresh, res);
-    const response = { statusCode: 200, success: true, data: attach, message: "Connexion réussie" };
+    const response = { statusCode: 200, success: true, data: {_id:foundUser._id}, message: "Connexion réussie" };
     return res.status(200).json(response);
 });
 // ----------------------------------------------------------------------------
@@ -77,17 +74,16 @@ export const checkPhoneCode = catchAsync(async (req, res, next) => {
     }
     await foundUser.save({ new: true, runValidators: true });
 
-    const attach = jwtToken.attachTokensToUser(foundUser);
-    jwtCookie.attachCookies(attach.access, attach.refresh, res);
-    const response = { statusCode: 200, success: true, data: attach, message: "Connexion réussie" };
+    const response = { statusCode: 200, success: true, data: {_id:foundUser._id}, message: "Connexion réussie" };
     return res.status(200).json(response);
 
 });
 // ----------------------------------------------------------------------------
 export const addPhoneNumber = catchAsync(async (req, res, next) => {
     const { phone } = req.body;
+    
     const userId = req.query.id_user;
-    const user = await tbl_User.findOneAndUpdate(
+    const user = await tbl_User.findOne(
         { $or: [{ _id: req.user._id }, { _id: userId }] }
     ).select("+phoneCode");
     if (!user) {
@@ -102,12 +98,7 @@ export const addPhoneNumber = catchAsync(async (req, res, next) => {
     sendWhatsAppMessage(format).then(senderSMS => {
         console.log(senderSMS);
     });
-    const response = {
-        statusCode: 200,
-        success: true,
-        data: user._id,
-        message: "Code envoyé sur votre numéro Whatsapp."
-    };
+    const response = {statusCode: 200,success: true, data: {_id:user._id}, message: "Code envoyé sur votre numéro Whatsapp."};
     return res.status(200).json(response);
 
 })
@@ -123,7 +114,7 @@ export const addEmail = catchAsync(async (req, res, next) => {
     user.isEmailVerified = false
     user.generateCodeAndDateTime("emailCode", "emailCodeExpiresAt");
     await user.save({ new: true, runValidators: true });
-    const response = { statusCode: 200, success: true, data: user._id, message: "Code envoyé sur votre courriel." };
+    const response = {statusCode: 200,success: true, data: {_id:user._id}, message: "Code envoyé sur votre courriel."};
 
     // send email asynchronously
     const format = emailTypes.emailChangeReset;
@@ -150,7 +141,7 @@ export const forgetPwd = catchAsync(async (req, res, next) => {
         user.generateCodeAndDateTime("emailCode", "emailCodeExpiresAt");
         await user.save();
         const response = {
-            statusCode: 200, success: true, data: user._id, message: "Code envoyé sur votre courriel."
+            statusCode: 200, success: true, data: {_id:user._id}, message: "Code envoyé sur votre courriel."
         };
         // send email asynchronously
         const format = emailTypes.emailCheckResetPassword;
@@ -170,7 +161,7 @@ export const forgetPwd = catchAsync(async (req, res, next) => {
         user.generateCodeAndDateTime("phoneCode", "phoneCodeExpiresAt");
         await user.save();
         const response = {
-            statusCode: 200, success: true, data: user._id, message: "Code envoyé sur votre whatsapp."
+            statusCode: 200, success: true, data: {_id:user._id}, message: "Code envoyé sur votre whatsapp."
         };
         // send sms whatsapp asynchronously
         const format = CodeSMS(user.phone, user.phoneCode, "RESET_PWD");
