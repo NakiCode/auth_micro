@@ -34,7 +34,7 @@ export const checkEmailCode = catchAsync(async (req, res, next) => {
     }
     foundUser.emailCode = null;
     foundUser.emailCodeExpiresAt = null;
-    if (req.path.includes('verify/email/account')) {
+    if (req.path.includes('verify/email/account') || !foundUser.isEmailVerified) {
         foundUser.isEmailVerified = true;
     }
     await foundUser.save({ new: true, runValidators: true });
@@ -120,6 +120,7 @@ export const addEmail = catchAsync(async (req, res, next) => {
         return res.status(401).json(respo);
     }
     user.email = email;
+    user.isEmailVerified = false
     user.generateCodeAndDateTime("emailCode", "emailCodeExpiresAt");
     await user.save({ new: true, runValidators: true });
     const response = { statusCode: 200, success: true, data: user._id, message: "Code envoyé sur votre courriel." };
