@@ -28,7 +28,12 @@ app.use(express.static("files"));
 app.use(cookieParser());
 
 if (process.env.NODE_ENV === "production") {
-  const accessLogStream = fs.createWriteStream("/log/journal.log", {
+  await createDirectories().then(() => {
+    console.log("Dossiers creés avec succes");
+  }).catch((err) => {
+    console.error(err);
+  })
+  const accessLogStream = fs.createWriteStream("log/journal.log", {
     flags: "a"
   });
   app.use(morgan("combined", { stream: accessLogStream }));
@@ -55,7 +60,7 @@ app.disable("x-powered-by");
 if (process.env.NODE_ENV === "development") {
   app.use(cors());
 } else if (process.env.NODE_ENV === "production") {
-  const whitelist = ["*"];
+  const whitelist = ["0.0.0.0"];
   const corsOptions = {
     origin: function (origin, callback) {
       if (whitelist.includes(origin)) {
@@ -73,6 +78,7 @@ app.use(toobusyProtect);
 // Routes
 app.use(`${process.env.BASE_URL}/user`, userRoute);
 // Middleware de gestion des erreurs
+
 app.use(errorHandle);
 
 const PORT = process.env.PORT || 5000;
@@ -80,6 +86,6 @@ const PORT = process.env.PORT || 5000;
 // Connexion à la base de données
 dbConnect();
 
-app.listen(PORT, () => {
-  console.log(`Le serveur écoute sur le port : ${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Le serveur écoute sur le port : ${PORT} en mode ${process.env.NODE_ENV} `);
 });

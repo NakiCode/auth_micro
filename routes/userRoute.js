@@ -16,9 +16,6 @@ router.get("/logout", protect, userSecure.logout);
 router.patch("/update", protect, userController.updateUser);
 router.get("/find", protect, userController.findUser);
 router.delete("/delete", protect, userController.deleteUser);
-// VERIFY EMAIL OR PHONE ACCOUNT
-router.get("/verify/email/account", userSecure.checkEmailCode);
-router.get("/verify/phone/account", userSecure.checkPhoneCode);
 // VERIFY CODE SENT TO EMAIL OR PHONE
 router.get("/verify/code/email", userSecure.checkEmailCode);
 router.get("/verify/code/phone", userSecure.checkPhoneCode);

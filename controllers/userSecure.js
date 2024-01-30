@@ -34,7 +34,7 @@ export const checkEmailCode = catchAsync(async (req, res, next) => {
     }
     foundUser.emailCode = null;
     foundUser.emailCodeExpiresAt = null;
-    if (req.path.includes('verify/email/account') || !foundUser.isEmailVerified) {
+    if (!foundUser.isEmailVerified) {
         foundUser.isEmailVerified = true;
     }
     await foundUser.save({ new: true, runValidators: true });
@@ -68,7 +68,7 @@ export const checkPhoneCode = catchAsync(async (req, res, next) => {
     }
     foundUser.phoneCode = null;
     foundUser.phoneCodeExpiresAt = null;
-    if (req.path.includes('verify/phone/account')) {
+    if (!foundUser.isPhoneVerified) {
         foundUser.isPhoneVerified = true;
     }
     await foundUser.save({ new: true, runValidators: true });

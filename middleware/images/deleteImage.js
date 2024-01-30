@@ -2,7 +2,7 @@ import fs from 'fs';
 
 const deleteOldImage = async (path) => {
   try {
-    const pathArray = path.split("/");
+    const pathArray = path?.split("/");
     const imageName = pathArray[pathArray.length - 1];
     let image = null;
 

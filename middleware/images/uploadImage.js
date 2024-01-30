@@ -2,10 +2,27 @@ import multer from "multer";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import errConstructor from "../err/err.js";
+import createDirectories from "../../helpers/file/file.js"
+
+const createFolder = async () => {
+    let folder = ""
+    const mode = process.env.NODE_ENV;
+    if (mode === 'development') {
+        await createDirectories();
+        folder = "files/images";
+    }else if (mode === 'production') {
+        await createDirectories();
+        folder = "client/build/images";
+    }
+    return folder
+}
+
+let folder = await createFolder();
+console.log(folder)
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, "files/images");
+        cb(null, folder);
     },
     filename: function (req, file, cb) {
         // Génération d'un nom de fichier unique

@@ -59,7 +59,7 @@ export const updateUser = catchAsync(async (req, res, next) => {
     const { fullname, username, location } = req.body;
 
     const user = await tbl_User.findByIdAndUpdate(req.user._id,
-        { fullname, username, address, location },
+        { fullname, username, location },
         { new: true, runValidators: true }
     );
     res.status(200).json({
