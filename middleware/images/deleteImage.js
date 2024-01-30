@@ -1,19 +1,23 @@
-import fs from 'fs'
-const deleteOldImage = (imagePath) =>{
-    try {
-        let image = null;
-        const path = user.profil;
-        const pathArray = path.split("/");
-        const imageName = pathArray[pathArray.length - 1];
-        if (process.env.NODE_ENV === "production") {
-          image = `client/build/images/${imageName}`;
-        } else {
-          image = `files/images/${imageName}`;
-        }
-        fs.unlinkSync(image);
-        return true
-    } catch (error) {
-        console.log(error)
+import fs from 'fs';
+
+const deleteOldImage = async (path) => {
+  try {
+    const pathArray = path.split("/");
+    const imageName = pathArray[pathArray.length - 1];
+    let image = null;
+
+    if (process.env.NODE_ENV === "production") {
+      image = `client/build/images/${imageName}`;
+    } else {
+      image = `files/images/${imageName}`;
     }
-}
+
+    await fs.promises.unlink(image);
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
 export default deleteOldImage;

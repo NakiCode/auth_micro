@@ -24,16 +24,8 @@ const dispatchImage = catchAsync(async (req, res, next) => {
     if (req.files["profil"]) {
       // delete the old image
       if (user.profil) {
-        let imagePath = null;
         const path = user.profil;
-        const pathArray = path.split("/");
-        const imageName = pathArray[pathArray.length - 1];
-        if (process.env.NODE_ENV === "production") {
-          imagePath = `client/build/images/${imageName}`;
-        } else {
-          imagePath = `files/images/${imageName}`;
-        }
-        fs.unlinkSync(imagePath);
+        await deleteOldImage(path)
         user.profil = null;
       }
       let file = req.files["profil"].map((file) => {
@@ -43,6 +35,9 @@ const dispatchImage = catchAsync(async (req, res, next) => {
       user.profil = formattedImagePath;
     }
     if (req.files["couverture"]) {
+      const path = user.couverture;
+      await deleteOldImage(path);
+      user.couverture = null;
       let file = req.files["couverture"].map((file) => {
         return file.path;
       });
