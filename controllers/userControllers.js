@@ -5,6 +5,7 @@ import * as jwtCookie from "../middleware/jwt/cookies.js";
 import { isStrengthPwd } from "../helpers/pwd/hashpwd.js";
 import sender from "../outils/mail/sender.js";
 import * as emailTypes from "../outils/mail/emailTypes.js";
+import deleteOldImage from "../middleware/images/deleteImage.js";
 
 // ---------------------------------------------------------------
 export const createUser = catchAsync(async (req, res, next) => {
@@ -55,7 +56,7 @@ export const login = catchAsync(async (req, res, next) => {
 // -----------------------------------------------------------------------------------
 // UPDATE USER
 export const updateUser = catchAsync(async (req, res, next) => {
-    const { fullname, username, address, location } = req.body;
+    const { fullname, username, location } = req.body;
 
     const user = await tbl_User.findByIdAndUpdate(req.user._id,
         { fullname, username, address, location },
@@ -89,8 +90,16 @@ export const findUser = catchAsync(async (req, res, next) => {
 // -----------------------------------------------------------------------------------
 // delete user 
 export const deleteUser = catchAsync(async (req, res, next) => {
+    const findUser = await tbl_User.findById(req.user._id);
+    let couverture = findUser.couverture
+    let profil = findUser.profil
     await tbl_User.findByIdAndDelete(req.user._id);
-
+    // delete photo profil and couverture
+    if (profil) {
+        await deleteOldImage(profil);
+    } else if(couverture){
+        await deleteOldImage(couverture);
+    }
     res.status(200).json({
         statusCode: 200,
         success: true,

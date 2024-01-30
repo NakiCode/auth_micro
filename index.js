@@ -14,7 +14,7 @@ import errorHandle from "./middleware/err/errHendle.js";
 import toobusyProtect from "./middleware/secure/toobusy.js";
 import userRoute from "./routes/userRoute.js";
 import errConstructor from "./middleware/err/err.js";
-
+import createDirectories from "./helpers/file/file.js";
 // Configuration
 dotenv.config();
 moment.tz.setDefault(process.env.TIMEZONE);

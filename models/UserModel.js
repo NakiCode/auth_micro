@@ -66,12 +66,19 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true
     },
-    address: {
-      type: String,
-      trim: true
-    },
     location: {
-      type: [Number]
+      type: {
+        type: String, // Don't do `{ location: { type: String } }`
+        enum: ['Point'], // 'location.type' must be 'Point'
+        default: 'Point'
+      },
+      coordinates: {
+        type: [Number]
+      },
+      address: {
+        type: String,
+        trim: true
+      },
     },
     isEmailVerified: {
       type: Boolean,

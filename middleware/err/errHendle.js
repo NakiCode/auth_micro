@@ -10,12 +10,15 @@ const response = (code, success, data, message) => {
     return responseData;
 };
 const errorHandle = (err, req, res, next) => {
-    console.log(err)
     if (err.name === "ValidationError") {
         const errors = Object.values(err.errors).map((el) => el.message);
         const message = errors.join('. ');
         const respo = response(400, false, [], message);
         return res.status(400).json(respo);
+    }
+    if (err.name === "FileError") {
+        const respo = response(500, false, [], err.message);
+        return res.status(500).json(respo);
     }
     if (err.name === "CorsError") {
         const message = err.message;
