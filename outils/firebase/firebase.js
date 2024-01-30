@@ -2,9 +2,7 @@ import admin from "firebase-admin";
 import serviceAccount from "./bujafoodFirebase.json" assert { type: "json" };
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://naki-bujafood-default-rtdb.europe-west1.firebasedatabase.app",
-    storageBucket: "naki-bujafood.appspot.com"
+    credential: admin.credential.cert(serviceAccount)
 });
 
 export const createFirebaseToken = async (uid, token) => {

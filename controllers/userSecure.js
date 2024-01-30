@@ -164,7 +164,7 @@ export const forgetPwd = catchAsync(async (req, res, next) => {
 })
 // ----------------------------------------------------------------------------
 export const resetPwd = catchAsync(async (req, res, next)=>{
-    const {id_user} = req.query
+    const {id} = req.params
     const {password, confirmpassword} = req.body
     const isStrong = isStrengthPwd(password, confirmpassword);
     if (!isStrong.success) {
@@ -175,15 +175,14 @@ export const resetPwd = catchAsync(async (req, res, next)=>{
             message: isStrong.message
         });
     }
-    const user = await tbl_User.findOneAndUpdate(
-        { _id: id_user }
-    ).select("+tokenId");
+
+    const user = await tbl_User.findOne({ _id: id }).select("+tokenId");
     if (!user) {
         const respo = { statusCode: 401, success: false, data: [], message: "Veuillez réessayer ulterieurement !" };
         return res.status(401).json(respo);
     }
     user.password = password
-    user.generateCodeAndDateTime("tokenId");
+    user.generateCode("tokenId");
     await user.save({ new: true, runValidators: true });
 
     const attach = jwtToken.attachTokensToUser(user);

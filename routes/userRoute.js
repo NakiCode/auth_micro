@@ -26,7 +26,7 @@ router.get("/verify/code/phone", userSecure.checkPhoneCode);
 router.patch("/add/phonenumber", protect, userSecure.addPhoneNumber);
 router.patch("/add/email", protect, userSecure.addEmail);
 router.get("/forget/pwd", userSecure.forgetPwd);
-router.post("/reset/pwd", userSecure.resetPwd);
+router.post("/reset/pwd/:id", userSecure.resetPwd);
 router.get("/refresh", refresh);
 
 // UPLOAD IMAGE
