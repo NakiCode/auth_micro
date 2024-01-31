@@ -2,7 +2,7 @@ import multer from "multer";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import errConstructor from "../err/err.js";
-import createDirectories from "../../helpers/file/file.js"
+import createDirectories from "../../helpers/filesyst/file.js"
 
 const createFolder = async () => {
     let folder = ""
