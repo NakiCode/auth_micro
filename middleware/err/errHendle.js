@@ -27,7 +27,7 @@ const logErrorToFile = (error, req) => {
 
 const errorHandle = (err, req, res, next) => {
   let respo = response(400, false, [], "");
-
+  console.log(err)
   if (err.name === "ValidationError") {
     const errors = Object.values(err.errors).map((el) => el.message);
     const message = errors.join(". ");

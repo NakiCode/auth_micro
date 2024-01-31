@@ -10,6 +10,7 @@ import deleteOldImage from "../middleware/images/deleteImage.js";
 // ---------------------------------------------------------------
 export const createUser = catchAsync(async (req, res, next) => {
     const { fullname, username, email, phone, password, confirmpassword, firebaseToken, address, location } = req.body
+    
     const isStrong = isStrengthPwd(password, confirmpassword);
     if (!isStrong.success) {
         return res.status(isStrong.statusCode).json({ statusCode: isStrong.statusCode, success: isStrong.success, data: [], message: isStrong.message});
