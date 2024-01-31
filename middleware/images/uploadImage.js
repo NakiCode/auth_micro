@@ -18,7 +18,7 @@ const createFolder = async () => {
 }
 
 let folder = await createFolder();
-console.log(folder)
+
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
