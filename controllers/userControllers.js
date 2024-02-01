@@ -5,15 +5,18 @@ import * as jwtCookie from "../middleware/jwt/cookies.js";
 import { isStrengthPwd } from "../helpers/pwd/hashpwd.js";
 import sender from "../outils/mail/sender.js";
 import * as emailTypes from "../outils/mail/emailTypes.js";
-// --------------------------------------------------------------- OK
+import deleteOldImage from "../middleware/images/deleteImage.js";
+
+// ---------------------------------------------------------------
 export const createUser = catchAsync(async (req, res, next) => {
     const { fullname, username, email, phone, password, confirmpassword, firebaseToken, address, location } = req.body
+    
     const isStrong = isStrengthPwd(password, confirmpassword);
     if (!isStrong.success) {
         return res.status(isStrong.statusCode).json({ statusCode: isStrong.statusCode, success: isStrong.success, data: [], message: isStrong.message });
     }
-    const user = await tbl_User.create({ fullname, username, email, phone, password, firebaseToken, address, location });
-    res.status(201).json({ statusCode: 201, success: true, data: { _id: user._id }, message: "Compte crée avec succes. Un mail de varification est envoyé sur votre boite mail !" });
+    const user = await tbl_User.create({ fullname, username, email, phone, password, firebaseToken, address, location});
+    res.status(201).json({ statusCode: 201, success: true, data: {_id:user._id}, message: "Compte crée avec succes. Un mail de varification est envoyé sur votre boite mail !"});
     // send email
     let format = emailTypes.createUserAccount
     format.code = user.emailCode
@@ -73,10 +76,10 @@ export const login = catchAsync(async (req, res, next) => {
 // -----------------------------------------------------------------------------------
 // UPDATE USER
 export const updateUser = catchAsync(async (req, res, next) => {
-    const { fullname, username, address, location } = req.body;
+    const { fullname, username, location } = req.body;
 
     const user = await tbl_User.findByIdAndUpdate(req.user._id,
-        { fullname, username, address, location },
+        { fullname, username, location },
         { new: true, runValidators: true }
     );
     res.status(200).json({
@@ -107,8 +110,16 @@ export const findUser = catchAsync(async (req, res, next) => {
 // -----------------------------------------------------------------------------------
 // delete user 
 export const deleteUser = catchAsync(async (req, res, next) => {
+    const findUser = await tbl_User.findById(req.user._id);
+    let couverture = findUser.couverture
+    let profil = findUser.profil
     await tbl_User.findByIdAndDelete(req.user._id);
-
+    // delete photo profil and couverture
+    if (profil) {
+        await deleteOldImage(profil);
+    } else if(couverture){
+        await deleteOldImage(couverture);
+    }
     res.status(200).json({
         statusCode: 200,
         success: true,

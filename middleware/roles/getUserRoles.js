@@ -1,11 +1,12 @@
-import catchAsync from "../../middleware/catch/catchAsync.js";
+import catchAsync from "../catch/catchAsync.js";
 import { tbl_User } from "../../models/UserModel.js";
 
 const isAuthorizeToAccess = (roles) => catchAsync(async (req, res, next) => {
   const allRoles = {
     ADMIN: "ADMIN",
     USER: "USER",
-    ANONYMOUS: "ANONYMOUS"
+    ANONYMOUS: "ANONYMOUS",
+    SUPERADMIN: "SUPERADMIN"
   };
 
   const validRoles = roles.filter(role => Object.values(allRoles).includes(role));

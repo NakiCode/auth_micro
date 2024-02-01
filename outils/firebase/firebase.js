@@ -1,15 +1,9 @@
 import * as admin from 'firebase-admin/app';
 import { cert } from 'firebase-admin/app'; // Importation modifiée
 
-import serviceAccount from './bujafoodFirebase.json' assert { type: "json" };
-
-try {
-  admin.initializeApp({
-    credential: cert(serviceAccount), // Utilisation correcte de cert
-  });
-} catch (error) {
-  console.error("Erreur lors de l'initialisation de Firebase:", error); // Gestion des erreurs
-}
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
 
 export const createFirebaseToken = async (uid, token) => {
     // Validation des entrées

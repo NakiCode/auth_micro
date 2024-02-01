@@ -34,7 +34,7 @@ export const checkEmailCode = catchAsync(async (req, res, next) => {
     }
     foundUser.emailCode = null;
     foundUser.emailCodeExpiresAt = null;
-    if (req.path.includes('verify/email/account')) {
+    if (!foundUser.isEmailVerified) {
         foundUser.isEmailVerified = true;
     }
     await foundUser.save({ new: true, runValidators: true });
@@ -45,7 +45,6 @@ export const checkEmailCode = catchAsync(async (req, res, next) => {
 export const checkPhoneCode = catchAsync(async (req, res, next) => {
     const defaultResponse = { statusCode: 404, success: false, data: [], message: "Code invalide" };
     let foundUser = undefined;
-
     if (!req.query.code || req.query.code.length < 4) {
         defaultResponse.message = "Veuillez renseigner un code valide";
         return res.status(404).json(defaultResponse);
@@ -69,7 +68,7 @@ export const checkPhoneCode = catchAsync(async (req, res, next) => {
     }
     foundUser.phoneCode = null;
     foundUser.phoneCodeExpiresAt = null;
-    if (req.path.includes('verify/phone/account')) {
+    if (!foundUser.isPhoneVerified) {
         foundUser.isPhoneVerified = true;
     }
     await foundUser.save({ new: true, runValidators: true });
@@ -81,11 +80,8 @@ export const checkPhoneCode = catchAsync(async (req, res, next) => {
 // ----------------------------------------------------------------------------
 export const addPhoneNumber = catchAsync(async (req, res, next) => {
     const { phone } = req.body;
-    
-    const userId = req.query.id_user;
-    const user = await tbl_User.findOne(
-        { $or: [{ _id: req.user._id }, { _id: userId }] }
-    ).select("+phoneCode");
+
+    const user = await tbl_User.findOne({ _id: req.user._id }).select("+phoneCode");
     if (!user) {
         const respo = { statusCode: 401, success: false, data: [], message: "Veuillez réessayer ultérieurement !" };
         return res.status(401).json(respo);
@@ -111,6 +107,7 @@ export const addEmail = catchAsync(async (req, res, next) => {
         return res.status(401).json(respo);
     }
     user.email = email;
+    user.isEmailVerified = false
     user.generateCodeAndDateTime("emailCode", "emailCodeExpiresAt");
     await user.save({ new: true, runValidators: true });
     const response = {statusCode: 200,success: true, data: {_id:user._id}, message: "Code envoyé sur votre courriel."};
@@ -130,18 +127,14 @@ export const forgetPwd = catchAsync(async (req, res, next) => {
         return res.status(401).json(respo);
     }
     if (email) {
-        const user = await tbl_User.findOneAndUpdate(
-            { email: email }
-        ).select("+emailCode");
+        const user = await tbl_User.findOne({ email: email, isEmailVerified: true }).select("+emailCode");
         if (!user) {
-            const respo = { statusCode: 401, success: false, data: [], message: "Veuillez réessayer ultérieurement !" };
+            const respo = { statusCode: 401, success: false, data: [], message: "Cette adresse courriel n'existe pas ou n'est pas activé !" };
             return res.status(401).json(respo);
         }
         user.generateCodeAndDateTime("emailCode", "emailCodeExpiresAt");
         await user.save();
-        const response = {
-            statusCode: 200, success: true, data: {_id:user._id}, message: "Code envoyé sur votre courriel."
-        };
+        const response = {statusCode: 200, success: true, data: {_id:user._id}, message: "Code envoyé sur votre courriel."};
         // send email asynchronously
         const format = emailTypes.emailCheckResetPassword;
         format.code = user.emailCode;
@@ -150,11 +143,9 @@ export const forgetPwd = catchAsync(async (req, res, next) => {
         });
     }
     if (phone) {
-        const user = await tbl_User.findOneAndUpdate(
-            { phone: phone }
-        ).select("+phoneCode");
+        const user = await tbl_User.findOne({ phone: phone, isPhoneVerified: true }).select("+phoneCode");
         if (!user) {
-            const respo = { statusCode: 401, success: false, data: [], message: "Veuillez réessayer ultérieurement !" };
+            const respo = { statusCode: 401, success: false, data: [], message: "Cette adresse whatsapp n'existe pas ou n'est pas activé !" };
             return res.status(401).json(respo);
         }
         user.generateCodeAndDateTime("phoneCode", "phoneCodeExpiresAt");
@@ -173,7 +164,7 @@ export const forgetPwd = catchAsync(async (req, res, next) => {
 })
 // ----------------------------------------------------------------------------
 export const resetPwd = catchAsync(async (req, res, next)=>{
-    const {id_user} = req.query
+    const {id} = req.params
     const {password, confirmpassword} = req.body
     const isStrong = isStrengthPwd(password, confirmpassword);
     if (!isStrong.success) {
@@ -184,15 +175,14 @@ export const resetPwd = catchAsync(async (req, res, next)=>{
             message: isStrong.message
         });
     }
-    const user = await tbl_User.findOneAndUpdate(
-        { _id: id_user }
-    ).select("+tokenId");
+
+    const user = await tbl_User.findOne({ _id: id }).select("+tokenId");
     if (!user) {
         const respo = { statusCode: 401, success: false, data: [], message: "Veuillez réessayer ulterieurement !" };
         return res.status(401).json(respo);
     }
     user.password = password
-    user.generateCodeAndDateTime("tokenId");
+    user.generateCode("tokenId");
     await user.save({ new: true, runValidators: true });
 
     const attach = jwtToken.attachTokensToUser(user);
@@ -202,3 +192,9 @@ export const resetPwd = catchAsync(async (req, res, next)=>{
 
 })
 // ----------------------------------------------------------------------------
+// LOGOUT   
+export const logout = catchAsync(async (req, res, next) => {
+    jwtCookie.deleteCookies(res);
+    const response = { statusCode: 200, success: true, data: [], message: "Connexion déconnectée" };
+    return res.status(200).json(response);
+})

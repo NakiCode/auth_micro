@@ -1,93 +1,95 @@
 import mongoose from "mongoose";
+import fs from "fs";
 
 const response = (code, success, data, message) => {
-    const responseData = {
-        statusCode: code,
-        success: success,
-        data: data ? data : [],
-        message: message ? message : "",
-    }; 
-    return responseData;
+  const responseData = {
+    statusCode: code,
+    success: success,
+    data: data ? data : [],
+    message: message ? message : "",
+  };
+  return responseData;
 };
+
+const logErrorToFile = (error, req) => {
+  const logMessage = `Timestamp: ${new Date().toISOString()}\n` +
+    `URL: ${req.url}\n` +
+    `Method: ${req.method}\n` +
+    `IP: ${req.ip}\n` +
+    `Error: ${error.message}\n\n`;
+  
+  fs.appendFile("error.log", logMessage, (err) => {
+    if (err) {
+      console.error("Failed to write error to file:", err);
+    }
+  });
+};
+
 const errorHandle = (err, req, res, next) => {
-    console.log(err)
-    if (err.name === "ValidationError") {
-        const errors = Object.values(err.errors).map((el) => el.message);
-        const message = errors.join('. ');
-        const respo = response(400, false, [], message);
-        return res.status(400).json(respo);
-    }
-    if (err.name === "CorsError") {
-        const message = err.message;
-        const respo = response(403, false, [], message);
-        return res.status(403).json(respo);
-    }
-    if (err instanceof mongoose.CastError) {
-        const respo = response(400, false, [], "Invalid ID");
-        return res.status(400).json(respo);
-    }
-    if (
-        err instanceof SyntaxError &&
-        err.status === 400 &&
-        "body" in err
-    ) {
-        const respo = response(400, false, [], "Requête invalide");
-        return res.status(400).json(respo);
-    }
-    if (err.name === "ReferenceError") {
-        const respo = response(400, false, [], "Requête invalide");
-        return res.status(400).json(respo);
-    }
-    if (err.name === "FileErrHandle") {
-        const respo = response(400, false, [], err.message);
-        return res.status(400).json(respo);
-    }
-    if (err.name === "MulterError") {
-        const respo = response(400, false, [], err.message);
-        return res.status(400).json(respo);
-    }
-    if (err.name === "TypeError") {
-        const respo = response(400, false, [], err.message);
-        return res.status(400).json(respo);
-    }
-    if (err.name === "NotFindErr") {
-        const respo = response(404, false, [], err.message);
-        return res.status(404).json(respo);
-    }
-    if (err.code === "ENOENT") {
-        const respo = response(400, false, [], "Problème d'accès au fichier");
-        return res.status(400).json(respo);
-    }
-    if(err.name === "TokenExpiredError"){
-        const respo = response(400, false, [], err.message);
-        return res.status(400).json(respo);
-    }
-    if (err.name === "MongooseServerSelectionError") {
-        const respo = response(500, false, [], "Impossible de se connecter à la base de données MongoDB");
-        return res.status(500).json(respo);
-    }
-    if (err.name === "MongoServerError" && err.code === 11000) {
-        const value = Object.keys(err.keyValue)[0];
-        const respo = response(409, false, [], `Un(e) ${value} est invalide ou existe déjà. Veuillez choisir un autre`);
-        return res.status(409).json(respo);
-    }
-    if (err.name === "JsonWebTokenError") {
-        const respo = response(403, false, [], "Vous n'avez pas d'autorisation d'accéder à cette ressource");
-        return res.status(401).json(respo);
-    }
-    if (err.name === "AssertionError") {
-        const respo = response(403, false, [], "Veuillez réessayer ultérieurement !");
-        return res.status(403).json(respo);
-    }
-    if (err.name === "ValidatorError") {
-        const respo = response(400, false, [], "Requête invalide");
-        return res.status(400).json(respo);
-    }
-    if (err instanceof Error) {
-        const respo = response(500, false, [], "Un problème est survenu");
-        return res.status(500).json(respo);
-    }
-    return next(err);
+  let respo = response(400, false, [], "");
+  console.log(err)
+  if (err.name === "ValidationError") {
+    const errors = Object.values(err.errors).map((el) => el.message);
+    const message = errors.join(". ");
+    respo.message = message;
+  } else if (err.name === "CorsError") {
+    respo.message = err.message;
+    respo.statusCode = 403;
+  } else if (err instanceof mongoose.CastError) {
+    respo.message = "Invalid ID";
+  } else if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    respo.message = "Requête invalide";
+  } else if (err.name === "ReferenceError") {
+    respo.message = "Requête invalide";
+  } else if (err.name === "FileErrHandle") {
+    respo.message = err.message;
+  } else if (err.name === "MulterError") {
+    respo.message = err.message;
+  } else if (err.name === "TypeError") {
+    respo.message = err.message;
+  } else if (err.name === "NotFindErr") {
+    respo.statusCode = 404;
+    respo.message = err.message;
+  } else if (err.code === "ENOENT") {
+    respo.message = "Problème d'accès au fichier";
+  } else if (err.name === "TokenExpiredError") {
+    respo.message = err.message;
+  } else if (err.name === "MongoServerError" && err.code === 11000) {
+    const value = Object.keys(err.keyValue)[0];
+    respo.statusCode = 409;
+    respo.message = `Un(e) ${value} est invalide ou existe déjà. Veuillez choisir un autre`;
+  } else if (err.name === "JsonWebTokenError") {
+    respo.statusCode = 401;
+    respo.message = "Vous n'avez pas d'autorisation d'accéder à cette ressource";
+  } else if (err.name === "AssertionError") {
+    respo.statusCode = 403;
+    respo.message = "Veuillez réessayer ultérieurement !";
+  } else if (err.name === "ValidatorError") {
+    respo.message = "Requête invalide";
+  } else if (err.name === "FileFormatError") {
+    respo.message = err.message;
+  } else if (err.name === "MongooseServerSelectionError") {
+    respo.statusCode = 500;
+    respo.message = "Impossible de se connecter à la base de données MongoDB";
+  } else if (err.name === "FileError") {
+    respo.statusCode = 500;
+    respo.message = err.message;
+  } else if (err instanceof Error) {
+    respo.statusCode = 500;
+    respo.message = err.message;
+  }
+
+  const mode = process.env.NODE_ENV;
+  if (mode === "production" && respo.statusCode === 500) {
+    logErrorToFile(err, req);
+    return res.status(500).json({
+      statusCode: 500,
+      success: false,
+      data: [],
+      message: "Une erreur s'est produite. Veuillez reessayer ulterieurement !"
+    })
+  }
+  return res.status(respo.statusCode).json(respo);
 };
 
 export default errorHandle;
