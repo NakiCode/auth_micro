@@ -1,11 +1,10 @@
 import bcrypt from "bcrypt";
-import mongoose, { Mongoose } from "mongoose";
+import mongoose from "mongoose";
 import validator from "validator";
 import { v4 as uuidv4 } from 'uuid'
 import * as generate from "../helpers/code/generate.js";
 import * as timeGenerate from "../helpers/date/time.js";
 import * as hashpwd from "../helpers/pwd/hashpwd.js";
-import * as firebase from "../outils/firebase/firebase.js";
 
 const errorMessages = {
     required: "The {PATH} is required",
@@ -41,6 +40,8 @@ const userSchema = new mongoose.Schema(
         phone: {
             type: String,
             trim: true,
+            unique: [true, errorMessages.unique],
+            required: [true, errorMessages.required],
             unique: [true, errorMessages.unique]
         },
         password: {
@@ -85,7 +86,7 @@ const userSchema = new mongoose.Schema(
         phoneCode: {
             type: String,
             trim: true,
-            //default: generate.generateCode(6),
+            default: generate.generateCode(6),
             select: false
         },
         emailCode: {
@@ -95,7 +96,8 @@ const userSchema = new mongoose.Schema(
             select: false
         },
         phoneCodeExpiresAt: {
-            type: Date
+            type: Date,
+            default: timeGenerate.DefaultDateExpires()
         },
         emailCodeExpiresAt: {
             type: Date,
@@ -110,7 +112,7 @@ const userSchema = new mongoose.Schema(
             type: String,
             trim: true,
             uppercase: true,
-            enum: ["ADMIN", "USER", "ANONYMOUS"],
+            enum: ["ADMIN", "USER", "ANONYMOUS", "SUPERADMIN"],
             default: "USER"
         },
     },
@@ -156,20 +158,6 @@ userSchema.pre("save", async function (next) {
     }
 });
 
-userSchema.pre("save", async function (next) {
-    if (!this.isModified("firebaseToken")) return next();
-    try {
-        // Obtention du tokenId de Firebase
-        const token = await admin.messaging().getToken(this._id);
-        // Création d'un nouveau tokenId de Firebase si nécessaire
-        if (!token) {
-            token = await admin.messaging().createToken();
-        }
-        this.firebaseToken = token;
-        next();
-    } catch (error) {
-        next(error);
-    }
-})
+// FIREBASE PRE HOOK
 
 export const tbl_User = mongoose.model("tbl_User", userSchema);

@@ -5,35 +5,53 @@ import * as jwtCookie from "../middleware/jwt/cookies.js";
 import { isStrengthPwd } from "../helpers/pwd/hashpwd.js";
 import sender from "../outils/mail/sender.js";
 import * as emailTypes from "../outils/mail/emailTypes.js";
-
-// ---------------------------------------------------------------
+// --------------------------------------------------------------- OK
 export const createUser = catchAsync(async (req, res, next) => {
-    const { fullname, username, email, password, confirmpassword, firebaseToken, address, location } = req.body
+    const { fullname, username, email, phone, password, confirmpassword, firebaseToken, address, location } = req.body
     const isStrong = isStrengthPwd(password, confirmpassword);
     if (!isStrong.success) {
-        return res.status(isStrong.statusCode).json({ statusCode: isStrong.statusCode, success: isStrong.success, data: [], message: isStrong.message});
+        return res.status(isStrong.statusCode).json({ statusCode: isStrong.statusCode, success: isStrong.success, data: [], message: isStrong.message });
     }
-    const user = await tbl_User.create({ fullname, username, email, password, firebaseToken, address, location});
-    res.status(201).json({ statusCode: 201, success: true, data: {_id:user._id}, message: "Compte crée avec succes. Un mail de varification est envoyé sur votre boite mail !"});
+    const user = await tbl_User.create({ fullname, username, email, phone, password, firebaseToken, address, location });
+    res.status(201).json({ statusCode: 201, success: true, data: { _id: user._id }, message: "Compte crée avec succes. Un mail de varification est envoyé sur votre boite mail !" });
     // send email
     let format = emailTypes.createUserAccount
     format.code = user.emailCode
     await sender(user.email, format);
+    // send sms Whatsapp
 
 });
 // -----------------------------------------------------------------------------------
 // LOGIN
 export const login = catchAsync(async (req, res, next) => {
     const { email, username, phone, password, } = req.body;
-    const user = await tbl_User.findOne(
-        {
-            $or: [{ email: email },
-            { username: username },
-            { phone: phone }]
+    let user = null
+    if (!email && !username && !phone && !password) {
+        const respo = { statusCode: 401, success: false, data: [], message: "Veuillez renseigner un email, un nom d'utilisateur ou un numéro de whatsapp et un mot de passe !" };
+        return res.status(401).json(respo);
+    }
+    if (email) {
+        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+        const isValid = emailRegex.test(email);
+        if (!isValid) {
+            const respo = { statusCode: 401, success: false, data: [], message: "Veuillez renseigner un email valide !" };
+            return res.status(401).json(respo);
         }
-    ).select("+password +tokenId");
+        user = await tbl_User.findOne({ email: email }).select("+password +tokenId");
+    }
+    if (username) {
+        user = await tbl_User.findOne({ username: username }).select("+password +tokenId");
+    }
+    if (phone) {
+        const isValid = phone.toString().length === 10
+        if (!isValid) {
+            const respo = { statusCode: 401, success: false, data: [], message: "Veuillez renseigner un numéro de whatsapp valide !" };
+            return res.status(401).json(respo);
+        }
+        user = await tbl_User.findOne({ phone: phone }).select("+password +tokenId");
+    }
     if (!user) {
-        const respo = { statusCode: 401, success: false, data: [], message: "Veuillez vous inscrire !" };
+        const respo = { statusCode: 401, success: false, data: [], message: "Vos informations d'authentification sont incorrect !" };
         return res.status(401).json(respo);
     }
     const isMatch = await user.checkMatchPassword(password);

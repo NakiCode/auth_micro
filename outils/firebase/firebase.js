@@ -1,11 +1,15 @@
-import admin from "firebase-admin";
-import serviceAccount from "./bujafoodFirebase.json" assert { type: "json" };
+import * as admin from 'firebase-admin/app';
+import { cert } from 'firebase-admin/app'; // Importation modifiée
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://naki-bujafood-default-rtdb.europe-west1.firebasedatabase.app",
-    storageBucket: "naki-bujafood.appspot.com"
-});
+import serviceAccount from './bujafoodFirebase.json' assert { type: "json" };
+
+try {
+  admin.initializeApp({
+    credential: cert(serviceAccount), // Utilisation correcte de cert
+  });
+} catch (error) {
+  console.error("Erreur lors de l'initialisation de Firebase:", error); // Gestion des erreurs
+}
 
 export const createFirebaseToken = async (uid, token) => {
     // Validation des entrées
@@ -52,16 +56,12 @@ export const sendPushNotification = async (token, title, body) => {
     }
 };
 
-export const createFirebaseTokenByUserId = async (userId) => {
+export const createFirebaseTokenByUserId = async () => {
     // Obtention du tokenId de Firebase
-    const token = await admin.messaging().getToken(userId);
+    const token = await admin.messaging().getToken();
     // Création d'un nouveau tokenId de Firebase si nécessaire
     if (!token) {
         token = await admin.messaging().createToken();
     }
-    // Enregistrement du tokenId de Firebase dans la base de données
-    await db.collection("users").doc(userId).update({
-        tokenId: token,
-    });
     return token;
 };

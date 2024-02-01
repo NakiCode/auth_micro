@@ -6,7 +6,7 @@ const response = (code, success, data, message) => {
         success: success,
         data: data ? data : [],
         message: message ? message : "",
-    };
+    }; 
     return responseData;
 };
 const errorHandle = (err, req, res, next) => {
