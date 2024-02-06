@@ -91,13 +91,13 @@ const userSchema = new mongoose.Schema(
     phoneCode: {
       type: String,
       trim: true,
-      default: generate.generateCode(6),
+      default: generate.generateCode(4),
       select: false
     },
     emailCode: {
       type: String,
       trim: true,
-      default: generate.generateCode(6),
+      default: generate.generateCode(4),
       select: false
     },
     phoneCodeExpiresAt: {
@@ -140,7 +140,7 @@ userSchema.methods.generateCodeAndDateTime = function (
   codeField,
   datetimeField
 ) {
-  this[codeField] = generate.generateCode(6);
+  this[codeField] = generate.generateCode(4);
   this[datetimeField] = timeGenerate.DefaultDateExpires();
 };
 userSchema.methods.generateCode = function (codeField) {
