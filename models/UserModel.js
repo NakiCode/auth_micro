@@ -117,7 +117,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
       uppercase: true,
-      enum: ["ADMIN", "USER", "ANONYMOUS"],
+      enum: ["ADMIN", "USER", "ANONYMOUS", "SUPERADMIN"],
       default: "USER"
     }
   },

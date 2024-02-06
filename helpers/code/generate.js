@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from 'crypto';,
 export const gigenerateCode = (length = 8) => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     const randomBytes = crypto.randomBytes(length);
