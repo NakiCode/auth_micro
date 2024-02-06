@@ -1,5 +1,5 @@
-import admin from "firebase-admin";
-import serviceAccount from "./bujafoodFirebase.json" assert { type: "json" };
+import * as admin from 'firebase-admin/app';
+import { cert } from 'firebase-admin/app'; // Importation modifiée
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
@@ -50,16 +50,12 @@ export const sendPushNotification = async (token, title, body) => {
     }
 };
 
-export const createFirebaseTokenByUserId = async (userId) => {
+export const createFirebaseTokenByUserId = async () => {
     // Obtention du tokenId de Firebase
-    const token = await admin.messaging().getToken(userId);
+    const token = await admin.messaging().getToken();
     // Création d'un nouveau tokenId de Firebase si nécessaire
     if (!token) {
         token = await admin.messaging().createToken();
     }
-    // Enregistrement du tokenId de Firebase dans la base de données
-    await db.collection("users").doc(userId).update({
-        tokenId: token,
-    });
     return token;
 };

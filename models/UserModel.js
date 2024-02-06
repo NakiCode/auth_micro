@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import mongoose, { Mongoose } from "mongoose";
+import mongoose from "mongoose";
 import validator from "validator";
 import { v4 as uuidv4 } from "uuid";
 import * as generate from "../helpers/code/generate.js";
